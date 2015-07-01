@@ -15,11 +15,14 @@ namespace Gridrift
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Texture2D testPigTexture;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            this.Window.AllowUserResizing = true;
+            this.IsMouseVisible = true;
         }
 
         protected override void Initialize()
@@ -30,8 +33,9 @@ namespace Gridrift
 
         protected override void LoadContent()
         {
-
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            testPigTexture = Content.Load<Texture2D>("dXdGz");
         }
         protected override void UnloadContent()
         {
@@ -43,6 +47,9 @@ namespace Gridrift
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                 this.Exit();
 
+            
+                
+
             base.Update(gameTime);
         }
 
@@ -50,6 +57,10 @@ namespace Gridrift
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            spriteBatch.Begin();
+
+            spriteBatch.Draw(testPigTexture, new Rectangle(100, 100, 512, 512), Color.White);
+            spriteBatch.End();
             base.Draw(gameTime);
         }
     }
