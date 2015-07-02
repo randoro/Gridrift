@@ -21,20 +21,25 @@ namespace Gridrift
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            this.Window.AllowUserResizing = true;
-            this.IsMouseVisible = true;
+
+            
+            
         }
 
         protected override void Initialize()
         {
+            graphics.PreferredBackBufferHeight = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height;
+            graphics.PreferredBackBufferWidth = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Width;
+            //graphics.IsFullScreen = true;
+            graphics.ApplyChanges();
 
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
+            this.IsMouseVisible = true;
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
             testPigTexture = Content.Load<Texture2D>("dXdGz");
         }
         protected override void UnloadContent()
@@ -45,10 +50,21 @@ namespace Gridrift
         protected override void Update(GameTime gameTime)
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
+                //graphics.IsFullScreen = false;
+                //graphics.ApplyChanges();
                 this.Exit();
+            }
 
-            
+            if (Keyboard.GetState().IsKeyDown(Keys.Space))
+            {
+                graphics.ToggleFullScreen();
+            }
                 
+            
+            //Console.WriteLine("x:" + this.Window.ClientBounds.X + " y:" + this.Window.ClientBounds.Y + " height:" + this.Window.ClientBounds.Height + " width:" + this.Window.ClientBounds.Width);
+            Console.WriteLine("height:" + graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height + " width:" + graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Width);
+            
 
             base.Update(gameTime);
         }
