@@ -28,10 +28,10 @@ namespace Gridrift
 
         protected override void Initialize()
         {
-            graphics.PreferredBackBufferHeight = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height;
-            graphics.PreferredBackBufferWidth = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Width;
-            //graphics.IsFullScreen = true;
+            graphics.PreferredBackBufferHeight = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height / 2;
+            graphics.PreferredBackBufferWidth = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Width / 2;
             graphics.ApplyChanges();
+            this.Window.AllowUserResizing = true;
 
             base.Initialize();
         }
@@ -60,9 +60,11 @@ namespace Gridrift
             {
                 graphics.ToggleFullScreen();
             }
-                
-            
-            //Console.WriteLine("x:" + this.Window.ClientBounds.X + " y:" + this.Window.ClientBounds.Y + " height:" + this.Window.ClientBounds.Height + " width:" + this.Window.ClientBounds.Width);
+
+            Globals.currentWindowHeight = this.Window.ClientBounds.Height;
+            Globals.currentWindowWidth = this.Window.ClientBounds.Width;
+
+            Console.WriteLine("x:" + this.Window.ClientBounds.X + " y:" + this.Window.ClientBounds.Y + " height:" + this.Window.ClientBounds.Height + " width:" + this.Window.ClientBounds.Width);
             Console.WriteLine("height:" + graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height + " width:" + graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Width);
             
 
