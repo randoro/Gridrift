@@ -73,11 +73,13 @@ namespace Gridrift
 
         protected override void Draw(GameTime gameTime)
         {
+
+            
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(Globals.currentWindowWidth / 2, Globals.currentWindowHeight / 2, 0));
 
-            spriteBatch.Draw(testPigTexture, new Rectangle(100, 100, 512, 512), Color.White);
+            spriteBatch.Draw(testPigTexture, new Rectangle(-256, -256, 512, 512), Color.White);
             spriteBatch.End();
             base.Draw(gameTime);
         }
