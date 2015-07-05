@@ -60,10 +60,32 @@ namespace Gridrift
                 this.Exit();
             }
 
+            
+            
+
             if (Keyboard.GetState().IsKeyDown(Keys.Space))
             {
                 graphics.ToggleFullScreen();
             }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.A))
+            {
+                Player.changeVelocity(new Vector2(-0.5f, 0));
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.D))
+            {
+                Player.changeVelocity(new Vector2(0.5f, 0));
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.W))
+            {
+                Player.changeVelocity(new Vector2(0,-0.5f));
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.S))
+            {
+                Player.changeVelocity(new Vector2(0, 0.5f));
+            }
+
+            Player.updatePosition();
 
             Globals.currentWindowHeight = this.Window.ClientBounds.Height;
             Globals.currentWindowWidth = this.Window.ClientBounds.Width;
@@ -82,10 +104,13 @@ namespace Gridrift
             
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(Globals.currentWindowWidth / 2, Globals.currentWindowHeight / 2, 0));
+            spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(Globals.currentWindowWidth / 2 - Player.getPosition().X, Globals.currentWindowHeight / 2 - Player.getPosition().Y, 0));
             
             testChunk.draw(spriteBatch);
             testChunk2.draw(spriteBatch);
+
+            spriteBatch.Draw(Globals.testPigTexture, new Rectangle(Player.getPosition().X, Player.getPosition().Y, 32, 32), Color.White);
+                
             
             spriteBatch.End();
             base.Draw(gameTime);

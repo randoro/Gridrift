@@ -8,9 +8,32 @@ namespace Gridrift
 {
     public static class Globals
     {
+        //constants
+
+
+        /// <summary>
+        ///  Amount of pixels per tile length.
+        /// </summary>
+        public const int tileLength = 32;
+
+        /// <summary>
+        ///  Amount of tiles per chunk length.
+        /// </summary>
+        public const int chunkLength = 16;
+
+        /// <summary>
+        ///  Amount of chunks per region length.
+        /// </summary>
+        public const int regionLength = 32;
+
+
+
+        //global variables
         public static int currentWindowWidth;
         public static int currentWindowHeight;
 
+
+        //test variables
         public static Texture2D testPigTexture;
     }
 }
