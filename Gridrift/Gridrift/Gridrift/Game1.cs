@@ -70,19 +70,19 @@ namespace Gridrift
 
             if (Keyboard.GetState().IsKeyDown(Keys.A))
             {
-                Player.changeVelocity(new Vector2(-0.5f, 0));
+                Player.changeVelocity(new Vector2(-0.7f, 0));
             }
             else if (Keyboard.GetState().IsKeyDown(Keys.D))
             {
-                Player.changeVelocity(new Vector2(0.5f, 0));
+                Player.changeVelocity(new Vector2(0.7f, 0));
             }
             if (Keyboard.GetState().IsKeyDown(Keys.W))
             {
-                Player.changeVelocity(new Vector2(0,-0.5f));
+                Player.changeVelocity(new Vector2(0,-0.7f));
             }
             else if (Keyboard.GetState().IsKeyDown(Keys.S))
             {
-                Player.changeVelocity(new Vector2(0, 0.5f));
+                Player.changeVelocity(new Vector2(0, 0.7f));
             }
 
             Player.updatePosition();
@@ -90,8 +90,8 @@ namespace Gridrift
             Globals.currentWindowHeight = this.Window.ClientBounds.Height;
             Globals.currentWindowWidth = this.Window.ClientBounds.Width;
 
-            Console.WriteLine("x:" + this.Window.ClientBounds.X + " y:" + this.Window.ClientBounds.Y + " height:" + this.Window.ClientBounds.Height + " width:" + this.Window.ClientBounds.Width);
-            Console.WriteLine("height:" + graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height + " width:" + graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Width);
+            //Console.WriteLine("x:" + this.Window.ClientBounds.X + " y:" + this.Window.ClientBounds.Y + " height:" + this.Window.ClientBounds.Height + " width:" + this.Window.ClientBounds.Width);
+            //Console.WriteLine("height:" + graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height + " width:" + graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Width);
             
 
 

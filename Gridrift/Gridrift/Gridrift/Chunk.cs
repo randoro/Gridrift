@@ -10,7 +10,12 @@ namespace Gridrift
     class Chunk
     {
         public int xCoordinate, yCoordinate;
-
+        public long lastUpdate { set; get; } //saved in file
+        public byte terrainPopulated { set; get; } //saved in file
+        public long inhabitedTime { set; get; } //saved in file
+        public byte[] biomes { set; get; } //saved in file
+        public byte[] blocks { set; get; } //saved in file
+        public byte[] objects { set; get; } //saved in file
 
         /// <summary>
         ///  Holds all information a specific chunk has.
@@ -26,6 +31,7 @@ namespace Gridrift
         /// </summary>
         public void draw(SpriteBatch spriteBatch)
         {
+            
             for (int i = 0; i < 16; i++)
             {
                 for (int j = 0; j < 16; j++)
@@ -34,6 +40,7 @@ namespace Gridrift
                 }
                 
             }
+           
             
         }
     }

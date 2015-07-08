@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -35,5 +36,6 @@ namespace Gridrift
 
         //test variables
         public static Texture2D testPigTexture;
+
     }
 }
