@@ -7,6 +7,9 @@ using System.Text;
 
 namespace Gridrift
 {
+    /// <summary>
+    ///  Global Objects and variables.
+    /// </summary>
     public static class Globals
     {
         //constants
