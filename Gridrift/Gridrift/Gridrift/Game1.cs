@@ -15,15 +15,13 @@ namespace Gridrift
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        
-        Chunk testChunk;
-        Chunk testChunk2;
+        Dictionary<Tuple<int, int>, Chunk> chunkList;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-
+            chunkList = new Dictionary<Tuple<int, int>, Chunk>();
             
             
         }
@@ -43,8 +41,8 @@ namespace Gridrift
             this.IsMouseVisible = true;
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Globals.testPigTexture = Content.Load<Texture2D>("dXdGz");
-            testChunk = new Chunk(0, 0);
-            testChunk2 = new Chunk(-1, -1);
+            chunkList.Add(Tuple.Create(0, 0), new Chunk(0, 0));
+            chunkList.Add(Tuple.Create(-1, -1), new Chunk(-1, -1));
         }
         protected override void UnloadContent()
         {
@@ -105,9 +103,12 @@ namespace Gridrift
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(Globals.currentWindowWidth / 2 - Player.getPosition().X, Globals.currentWindowHeight / 2 - Player.getPosition().Y, 0));
-            
-            testChunk.draw(spriteBatch);
-            testChunk2.draw(spriteBatch);
+
+
+            foreach (KeyValuePair<Tuple<int, int>, Chunk> kvp in chunkList)
+            {
+                kvp.Value.draw(spriteBatch);
+            }
 
             spriteBatch.Draw(Globals.testPigTexture, new Rectangle(Player.getPosition().X, Player.getPosition().Y, 32, 32), Color.White);
                 
