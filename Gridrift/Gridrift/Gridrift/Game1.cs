@@ -40,7 +40,7 @@ namespace Gridrift
         {
             this.IsMouseVisible = true;
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            Globals.testPigTexture = Content.Load<Texture2D>("dXdGz");
+            Globals.testPigTexture = Content.Load<Texture2D>("playerSheet");
             chunkList.Add(Tuple.Create(0, 0), new Chunk(0, 0));
             chunkList.Add(Tuple.Create(-1, -1), new Chunk(-1, -1));
         }
@@ -110,8 +110,8 @@ namespace Gridrift
                 kvp.Value.draw(spriteBatch);
             }
 
-            spriteBatch.Draw(Globals.testPigTexture, new Rectangle(Player.getPosition().X, Player.getPosition().Y, 32, 32), Color.White);
-                
+            //spriteBatch.Draw(Globals.testPigTexture, new Rectangle(Player.getPosition().X, Player.getPosition().Y, 32, 32), Color.White);
+            spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(0, 0, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
             
             spriteBatch.End();
             base.Draw(gameTime);
