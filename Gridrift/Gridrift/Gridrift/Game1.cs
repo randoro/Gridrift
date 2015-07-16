@@ -111,8 +111,8 @@ namespace Gridrift
             }
 
             //spriteBatch.Draw(Globals.testPigTexture, new Rectangle(Player.getPosition().X, Player.getPosition().Y, 32, 32), Color.White);
-            spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(0, 0, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
-            
+            Player.draw(spriteBatch);
+
             spriteBatch.End();
             base.Draw(gameTime);
         }

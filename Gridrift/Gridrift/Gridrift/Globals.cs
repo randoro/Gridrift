@@ -7,13 +7,15 @@ using System.Text;
 
 namespace Gridrift
 {
+    public enum Direction { None, North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest }
+
     /// <summary>
     ///  Global Objects and variables.
     /// </summary>
     public static class Globals
     {
         //constants
-
+        
 
         /// <summary>
         ///  Amount of pixels per tile length.
