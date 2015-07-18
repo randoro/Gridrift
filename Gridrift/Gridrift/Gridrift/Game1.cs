@@ -83,7 +83,7 @@ namespace Gridrift
                 Player.changeVelocity(new Vector2(0, 0.7f));
             }
 
-            Player.updatePosition();
+            Player.update(gameTime);
 
             Globals.currentWindowHeight = this.Window.ClientBounds.Height;
             Globals.currentWindowWidth = this.Window.ClientBounds.Width;
@@ -104,11 +104,16 @@ namespace Gridrift
 
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(Globals.currentWindowWidth / 2 - Player.getPosition().X, Globals.currentWindowHeight / 2 - Player.getPosition().Y, 0));
 
-
-            foreach (KeyValuePair<Tuple<int, int>, Chunk> kvp in chunkList)
+            Point p = Translation.exactPosToChunkCoords(Player.getPosition());
+            if (chunkList.ContainsKey(Tuple.Create(p.X, p.Y)))
             {
-                kvp.Value.draw(spriteBatch);
+                Chunk chu = chunkList[Tuple.Create(p.X, p.Y)];
+                chu.draw(spriteBatch);
             }
+            //foreach (KeyValuePair<Tuple<int, int>, Chunk> kvp in chunkList)
+            //{
+            //    kvp.Value.draw(spriteBatch);
+            //}
 
             //spriteBatch.Draw(Globals.testPigTexture, new Rectangle(Player.getPosition().X, Player.getPosition().Y, 32, 32), Color.White);
             Player.draw(spriteBatch);

@@ -15,6 +15,9 @@ namespace Gridrift
 
         private static Direction direction = Direction.None;
 
+        private static int animationCounter = 0;
+        private static int walkingFrame = 0;
+
         public static Point getPosition()
         {
             return new Point((int)position.X, (int)position.Y);
@@ -52,6 +55,7 @@ namespace Gridrift
             position += velocity;
             setDirection();
             decreaseVelocity();
+
         }
 
         /// <summary>
@@ -145,44 +149,69 @@ namespace Gridrift
             }
         }
 
+        public static void update(GameTime gameTime)
+        {
+            if (animationCounter >= 8)
+            {
+                if (direction.Equals(Direction.None))
+                {
+                    walkingFrame = 0;
+                }
+                else
+                {
+                    walkingFrame++;
+                    walkingFrame = walkingFrame % 4;
+                }
+                animationCounter = 0;
+            }
+            else
+            {
+                animationCounter++;
+            }
+
+            updatePosition();
+
+
+        }
+
         public static void draw(SpriteBatch spriteBatch)
         {
             switch (direction)
             {
                 case Direction.None:
-                    spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(0, 0, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
+                    spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(0, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
             
                     break;
                 case Direction.North:
-                    spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(64, 0, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
+                    spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(64, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
             
                     break;
                 case Direction.NorthEast:
-                    spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(224, 0, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
+                    spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(224, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
             
                     break;
                 case Direction.East:
-                    spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(96, 0, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
+                    spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(96, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
             
                     break;
                 case Direction.SouthEast:
-                    spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(128, 0, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
+                    spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(128, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
             
                     break;
                 case Direction.South:
-                    spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(0, 0, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
+                    spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(0, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
             
                     break;
                 case Direction.SouthWest:
-                    spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(160, 0, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
+                    spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(160, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
             
                     break;
                 case Direction.West:
-                    spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(32, 0, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
+                    spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(32, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
             
                     break;
                 case Direction.NorthWest:
-                    spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(192, 0, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
+                    spriteBatch.Draw(Globals.testPigTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(192, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);    
             
                     break;
                 default:
