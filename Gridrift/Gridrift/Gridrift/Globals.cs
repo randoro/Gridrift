@@ -40,7 +40,9 @@ namespace Gridrift
 
 
         //test variables
-        public static Texture2D testPigTexture;
+        public static Texture2D testPlayerTexture;
+        public static Texture2D testBackgroundTexture;
+        public static SpriteFont testFont;
 
     }
 }

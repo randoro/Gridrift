@@ -16,6 +16,7 @@ namespace Gridrift
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Dictionary<Tuple<int, int>, Chunk> chunkList;
+        Queue<Tuple<int, int>> chunkQueue;
 
         public Game1()
         {
@@ -40,7 +41,10 @@ namespace Gridrift
         {
             this.IsMouseVisible = true;
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            Globals.testPigTexture = Content.Load<Texture2D>("playerSheet");
+            chunkQueue = new Queue<Tuple<int, int>>();
+            Globals.testPlayerTexture = Content.Load<Texture2D>("playerSheet");
+            Globals.testBackgroundTexture = Content.Load<Texture2D>("dXdGz");
+            Globals.testFont = Content.Load<SpriteFont>("font");
             for (int i = 0; i < 10; i++)
             {
                 for (int j = 0; j < 10; j++)
@@ -107,7 +111,7 @@ namespace Gridrift
             
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(Globals.currentWindowWidth / 2 - Player.getPosition().X, Globals.currentWindowHeight / 2 - Player.getPosition().Y, 0));
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(Globals.currentWindowWidth / 2 - Player.getPosition().X, Globals.currentWindowHeight / 2 - Player.getPosition().Y, 0));
 
             Point p = Translation.exactPosToChunkCoords(Player.getPosition());
 
@@ -129,6 +133,7 @@ namespace Gridrift
             //}
 
             //spriteBatch.Draw(Globals.testPigTexture, new Rectangle(Player.getPosition().X, Player.getPosition().Y, 32, 32), Color.White);
+            spriteBatch.DrawString(Globals.testFont, "This is a test string", new Vector2(0, 0), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
             Player.draw(spriteBatch);
 
             spriteBatch.End();
