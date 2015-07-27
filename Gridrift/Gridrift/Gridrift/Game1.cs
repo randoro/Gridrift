@@ -18,6 +18,11 @@ namespace Gridrift
         Dictionary<Tuple<int, int>, Chunk> chunkList;
         Queue<Tuple<int, int>> chunkQueue;
 
+        #region debug
+        bool debuggingActive = false;
+        #endregion debug
+
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -67,7 +72,10 @@ namespace Gridrift
                 this.Exit();
             }
 
-            
+            if (Keyboard.GetState().IsKeyDown(Keys.F3))
+            {
+                debuggingActive = !debuggingActive;
+            }
             
 
             if (Keyboard.GetState().IsKeyDown(Keys.Space))
@@ -133,8 +141,14 @@ namespace Gridrift
             //}
 
             //spriteBatch.Draw(Globals.testPigTexture, new Rectangle(Player.getPosition().X, Player.getPosition().Y, 32, 32), Color.White);
-            spriteBatch.DrawString(Globals.testFont, "This is a test string", new Vector2(0, 0), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            //spriteBatch.DrawString(Globals.testFont, "This is a test string", new Vector2(0, 0), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
             Player.draw(spriteBatch);
+
+            #region debug
+            Point playerPos = Player.getPosition();
+            spriteBatch.DrawString(Globals.testFont, "Player: x:" + playerPos.X + " y:" + playerPos.Y, Camera.cameraPosition(), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            
+            #endregion debug
 
             spriteBatch.End();
             base.Draw(gameTime);
