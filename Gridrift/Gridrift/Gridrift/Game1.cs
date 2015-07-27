@@ -145,9 +145,15 @@ namespace Gridrift
             Player.draw(spriteBatch);
 
             #region debug
-            Point playerPos = Player.getPosition();
-            spriteBatch.DrawString(Globals.testFont, "Player: x:" + playerPos.X + " y:" + playerPos.Y, Camera.cameraPosition(), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            if (debuggingActive)
+            {
+                Point playerPos = Player.getPosition();
+                Vector2 cameraPos = Camera.cameraPosition();
+                spriteBatch.DrawString(Globals.testFont, "Player: x:" + playerPos.X + " y:" + playerPos.Y, new Vector2(cameraPos.X, cameraPos.Y), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                spriteBatch.DrawString(Globals.testFont, "Player Chunk: x:" + p.X + " y:" + p.Y, new Vector2(cameraPos.X, cameraPos.Y + 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                spriteBatch.DrawString(Globals.testFont, "Chunks Loaded:" + chunkList.Count, new Vector2(cameraPos.X, cameraPos.Y + 64), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
             
+            }
             #endregion debug
 
             spriteBatch.End();
