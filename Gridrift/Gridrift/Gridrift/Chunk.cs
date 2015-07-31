@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Gridrift
 {
-    class Chunk
+    public class Chunk
     {
         public int xCoordinate, yCoordinate;
         public long lastUpdate; //saved in file
