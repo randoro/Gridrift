@@ -37,6 +37,7 @@ namespace Gridrift
         //global variables
         public static int currentWindowWidth;
         public static int currentWindowHeight;
+        public static readonly String gamePath = AppDomain.CurrentDomain.BaseDirectory;
 
 
         //test variables

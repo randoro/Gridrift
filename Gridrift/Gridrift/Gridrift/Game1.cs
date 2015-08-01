@@ -17,6 +17,7 @@ namespace Gridrift
         SpriteBatch spriteBatch;
         Dictionary<Tuple<int, int>, Chunk> chunkList;
         Queue<Tuple<int, int>> chunkQueue;
+        InternalServer testServer;
 
         #region debug
         bool debuggingActive = false;
@@ -57,6 +58,8 @@ namespace Gridrift
                     chunkList.Add(Tuple.Create(j-5, i-5), new Chunk(j-5, i-5));
                 }
             }
+            testServer = new InternalServer(false);
+            
         }
         protected override void UnloadContent()
         {
