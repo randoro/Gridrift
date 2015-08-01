@@ -10,6 +10,7 @@ namespace Gridnet
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("Starting Gridnet Gridrift server...");
             while (true)
             {
 
