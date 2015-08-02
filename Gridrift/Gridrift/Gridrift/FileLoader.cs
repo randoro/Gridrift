@@ -28,9 +28,9 @@ namespace Gridrift
 
         public static void checkAndCreateFolder(String pathAndFolder)
         {
-            if (!Directory.Exists(Globals.gamePath + pathAndFolder))
+            if (!Directory.Exists(pathAndFolder))
             {
-                Directory.CreateDirectory(Globals.gamePath + pathAndFolder);
+                Directory.CreateDirectory(pathAndFolder);
             }
         }
 

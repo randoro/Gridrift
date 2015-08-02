@@ -35,5 +35,30 @@ namespace Gridrift
 
             return returnPoint;
         }
+
+        public static Point chunkCoordsToRegionCoords(Point chunkCords)
+        {
+
+            Point returnPoint = new Point(0, 0);
+            if (chunkCords.X >= 0)
+            {
+                returnPoint.X = (int)chunkCords.X / 32;
+            }
+            else
+            {
+                returnPoint.X = (int)chunkCords.X / 33 - 1;
+            }
+
+            if (chunkCords.Y >= 0)
+            {
+                returnPoint.Y = (int)chunkCords.Y / 32;
+            }
+            else
+            {
+                returnPoint.Y = (int)chunkCords.Y / 33 - 1;
+            }
+
+            return returnPoint;
+        }
     }
 }
