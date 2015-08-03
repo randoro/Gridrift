@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using ZLibNet;
 
 namespace Gridrift
 {
@@ -22,6 +23,14 @@ namespace Gridrift
 
             chunkScheme = new Int32[1024];
             tempCreateChunkScheme();
+
+            Zipper z = new Zipper();
+            z.ZipFile = @"d:\test\my.zip";
+            z.ItemList.Add(fileStream.Name);
+            z.PathInZip = enPathInZip.Relative;
+            z.Recurse = true;
+            z.Zip();
+
         }
 
         public void getChunk(Point chunkID)
@@ -39,6 +48,7 @@ namespace Gridrift
             {
                 throw new System.Exception();
             }
+            
             
         }
 
