@@ -13,7 +13,7 @@ namespace Gridrift
         private World world;
         private Point regionID;
         private FileStream fileStream;
-        private Int32[] chunkScheme;
+        private int[] chunkScheme;
 
         public Region(World world, Point regionID, FileStream fileStream)
         {
@@ -21,18 +21,18 @@ namespace Gridrift
             this.regionID = regionID;
             this.fileStream = fileStream;
 
-            chunkScheme = new Int32[1024];
+            chunkScheme = new int[1024];
             tempCreateChunkScheme();
 
             String name = fileStream.Name;
             fileStream.Dispose();
 
-            Zipper z = new Zipper();
-            z.ZipFile = @"d:\test\my.zip";
-            z.ItemList.Add(name);
-            z.PathInZip = enPathInZip.Relative;
-            z.Recurse = true;
-            z.Zip();
+            //Zipper z = new Zipper();
+            //z.ZipFile = @"d:\test\my.zip";
+            //z.ItemList.Add(name);
+            //z.PathInZip = enPathInZip.Relative;
+            //z.Recurse = true;
+            //z.Zip();
 
         }
 
