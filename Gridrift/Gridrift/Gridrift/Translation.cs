@@ -36,6 +36,9 @@ namespace Gridrift
             return returnPoint;
         }
 
+        /// <summary>
+        ///  Takes in an chunk coordinates as a Point and converts it to region coordinates in Point
+        /// </summary>
         public static Point chunkCoordsToRegionCoords(Point chunkCords)
         {
 
@@ -56,6 +59,32 @@ namespace Gridrift
             else
             {
                 returnPoint.Y = (int)chunkCords.Y / 33 - 1;
+            }
+
+            return returnPoint;
+        }
+
+        /// <summary>
+        ///  Takes in an chunk coordinates as a Point and converts it to internal chunk coordinates within a region 0-15 in Point
+        /// </summary>
+        public static Point chunkCoordsToInternalRegionChunkCoords(Point chunkCords)
+        {
+            Point returnPoint = new Point(0, 0);
+            if (chunkCords.X >= 0)
+            {
+                returnPoint.X = (int)chunkCords.X  % 32;
+            }
+            else
+            {
+                returnPoint.X = (32 + ((int)chunkCords.X) % 32) % 32;
+            }
+            if (chunkCords.Y >= 0)
+            {
+                returnPoint.Y = (int)chunkCords.Y % 32;
+            }
+            else
+            {
+                returnPoint.Y = (32 + ((int)chunkCords.Y) % 32) % 32;
             }
 
             return returnPoint;
