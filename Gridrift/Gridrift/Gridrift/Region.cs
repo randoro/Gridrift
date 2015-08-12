@@ -29,7 +29,7 @@ namespace Gridrift
             chunkIsPresent = new byte[1024];
             chunkPositionInFile = new int[1024];
             chunkSizeInBytes = new int[1024];
-            tempCreateChunkScheme();
+            //tempCreateChunkScheme();
             //saveRegionScheme();
             loadRegionScheme();
             int test = 0;
@@ -48,15 +48,16 @@ namespace Gridrift
             //uz.ZipFile = @"d:\test\my.zip";
             //uz.UnZip();
 
-            
-
         }
 
-        public void getChunk(Point chunkID)
+        public Chunk getChunk(Point chunkID)
         {
             Point checkingRegionID = Translation.chunkCoordsToRegionCoords(chunkID);
 
-            
+            if (chunkID.X == 0 && chunkID.Y == 0)
+            {
+                int test = 1;
+            }
 
             //Makes sure the chunk is inside this specific region
             if (regionID.X == checkingRegionID.X && regionID.Y == checkingRegionID.Y)
@@ -66,15 +67,21 @@ namespace Gridrift
                 //Checks if chunk is present
                 if (chunkIsPresent[chunkIDInArrays] == 1) 
                 {
-                    fetchByteArray(chunkPositionInFile[chunkIDInArrays], chunkSizeInBytes[chunkIDInArrays]);
-                    
+                    byte[] chunkData = fetchByteArray(chunkPositionInFile[chunkIDInArrays], chunkSizeInBytes[chunkIDInArrays]);
+                    return TagTranslator.getChunk(chunkData);
+                }
+                else
+                {
+                    //generate new Chunk
+                    return Generator.generateChunk(chunkID);
                 }
             }
             else
             {
                 throw new System.Exception("Trying to open a chunk in wrong region file.");
+                return new Chunk();
             }
-            
+            return new Chunk();
             
         }
 

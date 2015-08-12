@@ -51,14 +51,21 @@ namespace Gridrift
             Globals.testPlayerTexture = Content.Load<Texture2D>("playerSheet");
             Globals.testBackgroundTexture = Content.Load<Texture2D>("dXdGz");
             Globals.testFont = Content.Load<SpriteFont>("font");
+            testServer = new InternalServer(false);
+
             for (int i = 0; i < 10; i++)
             {
                 for (int j = 0; j < 10; j++)
                 {
-                    chunkList.Add(Tuple.Create(j-5, i-5), new Chunk(j-5, i-5));
+                    Point chunkID = new Point(j - 5, i - 5);
+                    if (chunkID.X == 0 && chunkID.Y == 0)
+                    {
+                        int test = 1;
+                    }
+                    chunkList.Add(Tuple.Create(j - 5, i - 5), testServer.getChunk(new World("world"), chunkID));
                 }
             }
-            testServer = new InternalServer(false);
+            
             
         }
         protected override void UnloadContent()
@@ -133,7 +140,10 @@ namespace Gridrift
                     if (chunkList.ContainsKey(Tuple.Create(p.X + j - 1, p.Y + i - 1)))
                     {
                         Chunk chu = chunkList[Tuple.Create(p.X + j - 1, p.Y + i - 1)];
-                        chu.draw(spriteBatch);
+                        if (chu != null)
+                        {
+                            chu.draw(spriteBatch);
+                        }
                     }
                 }
             }

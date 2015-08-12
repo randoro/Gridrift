@@ -78,6 +78,7 @@
     <Compile Include="Camera.cs" />
     <Compile Include="Chunk.cs" />
     <Compile Include="FileLoader.cs" />
+    <Compile Include="Generator.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="InternalServer.cs" />
     <Compile Include="Player.cs" />
