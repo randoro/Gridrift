@@ -13,6 +13,7 @@ namespace Gridrift
         public int xCoordinate, yCoordinate;
         public long lastUpdate; //saved in file
         public byte terrainPopulated; //saved in file
+        public byte structurePopulated; //saved in file
         public long inhabitedTime; //saved in file
         public byte[] biomes; //saved in file
         public byte[] blocks; //saved in file
@@ -25,6 +26,11 @@ namespace Gridrift
         {
             this.xCoordinate = xCoordinate;
             this.yCoordinate = yCoordinate;
+        }
+
+        public Chunk()
+        {
+
         }
 
         /// <summary>
