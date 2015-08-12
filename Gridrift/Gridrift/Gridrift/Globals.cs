@@ -8,6 +8,7 @@ using System.Text;
 namespace Gridrift
 {
     public enum Direction { None, North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest }
+    public enum TagID { End, Byte, Short, Int, Long, Float, Double, ByteArray, String, List, Compound, IntArray };
 
     /// <summary>
     ///  Global Objects and variables.
