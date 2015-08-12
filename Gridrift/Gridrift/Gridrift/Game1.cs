@@ -75,6 +75,23 @@ namespace Gridrift
 
         protected override void Update(GameTime gameTime)
         {
+
+            Point p = Translation.exactPosToChunkCoords(Player.getPosition());
+
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    if (!chunkList.ContainsKey(Tuple.Create(p.X + j - 1, p.Y + i - 1)))
+                    {
+                        Point newChunkCoords = new Point(p.X + j - 1, p.Y + i - 1);
+                        chunkList.Add(Tuple.Create(p.X + j - 1, p.Y + i - 1), testServer.getChunk(new World("world"), newChunkCoords));
+                    }
+                }
+            }
+
+
+
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
                 //graphics.IsFullScreen = false;
@@ -162,9 +179,11 @@ namespace Gridrift
             {
                 Point playerPos = Player.getPosition();
                 Vector2 cameraPos = Camera.cameraPosition();
+                int frameRate = Utility.CalculateFrameRate();
                 spriteBatch.DrawString(Globals.testFont, "Player: x:" + playerPos.X + " y:" + playerPos.Y, new Vector2(cameraPos.X, cameraPos.Y), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
                 spriteBatch.DrawString(Globals.testFont, "Player Chunk: x:" + p.X + " y:" + p.Y, new Vector2(cameraPos.X, cameraPos.Y + 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
                 spriteBatch.DrawString(Globals.testFont, "Chunks Loaded:" + chunkList.Count, new Vector2(cameraPos.X, cameraPos.Y + 64), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                spriteBatch.DrawString(Globals.testFont, "FPS:" + frameRate, new Vector2(cameraPos.X, cameraPos.Y + 96), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
             
             }
             #endregion debug

@@ -90,6 +90,7 @@
     <Compile Include="Tag.cs" />
     <Compile Include="TagTranslator.cs" />
     <Compile Include="Translation.cs" />
+    <Compile Include="Utility.cs" />
     <Compile Include="World.cs" />
   </ItemGroup>
   <ItemGroup>
