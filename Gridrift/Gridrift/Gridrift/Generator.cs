@@ -29,22 +29,22 @@ namespace Gridrift
 
             chunk.inhabitedTime = 0;
 
-            byte[] biomes = new byte[255];
-            for (int i = 0; i < 255; i++)
+            byte[] biomes = new byte[256];
+            for (int i = 0; i < 256; i++)
             {
                 biomes[i] = (byte)i;
             }
             chunk.biomes = biomes;
 
-            byte[] blocks = new byte[255];
-            for (int i = 0; i < 255; i++)
+            byte[] blocks = new byte[256];
+            for (int i = 0; i < 256; i++)
             {
                 blocks[i] = (byte)i;
             }
             chunk.blocks = blocks;
 
-            byte[] objects = new byte[255];
-            for (int i = 0; i < 255; i++)
+            byte[] objects = new byte[256];
+            for (int i = 0; i < 256; i++)
             {
                 objects[i] = (byte)i;
             }
