@@ -13,6 +13,7 @@ namespace Gridrift
         private World world;
         private Point regionID;
         private FileStream fileStream;
+        public long lastUsedTick;
 
         #region regionScheme
         private byte[] chunkIsPresent; //1 = chunk is there, 0 = chunk is not there.
@@ -25,6 +26,7 @@ namespace Gridrift
             this.world = world;
             this.regionID = regionID;
             this.fileStream = fileStream;
+            lastUsedTick = DateTime.Now.Ticks;
 
             chunkIsPresent = new byte[1024];
             chunkPositionInFile = new int[1024];
@@ -33,11 +35,11 @@ namespace Gridrift
             //saveRegionScheme();
             loadRegionScheme();
             int test = 0;
-            Zipper z = new Zipper();
-            z.ZipFile = @"d:\test\my.zip";
-            //z.ItemList.Add(name);
-            z.PathInZip = enPathInZip.Relative;
-            z.Recurse = true;
+            //Zipper z = new Zipper();
+            //z.ZipFile = @"d:\test\my.zip";
+            ////z.ItemList.Add(name);
+            //z.PathInZip = enPathInZip.Relative;
+            //z.Recurse = true;
             //z.Zip();
 
             //UnZipper uz = new UnZipper();
@@ -53,11 +55,7 @@ namespace Gridrift
         public Chunk getChunk(Point chunkID)
         {
             Point checkingRegionID = Translation.chunkCoordsToRegionCoords(chunkID);
-
-            if (chunkID.X == 0 && chunkID.Y == 0)
-            {
-                int test = 1;
-            }
+            lastUsedTick = DateTime.Now.Ticks;
 
             //Makes sure the chunk is inside this specific region
             if (regionID.X == checkingRegionID.X && regionID.Y == checkingRegionID.Y)
@@ -83,6 +81,11 @@ namespace Gridrift
             }
             return new Chunk();
             
+        }
+
+        public void unloadRegion()
+        {
+            fileStream.Close();
         }
 
         private void loadRegionScheme()

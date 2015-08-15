@@ -81,6 +81,7 @@
     <Compile Include="FileLoader.cs" />
     <Compile Include="Generator.cs" />
     <Compile Include="Globals.cs" />
+    <Compile Include="InternalPlayer.cs" />
     <Compile Include="InternalServer.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

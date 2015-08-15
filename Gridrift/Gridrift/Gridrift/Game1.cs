@@ -17,7 +17,7 @@ namespace Gridrift
         SpriteBatch spriteBatch;
         Dictionary<Tuple<int, int>, Chunk> chunkList;
         Queue<Tuple<int, int>> chunkQueue;
-        InternalServer testServer;
+        InternalServer internalServer;
 
         #region debug
         bool debuggingActive = false;
@@ -51,7 +51,7 @@ namespace Gridrift
             Globals.testPlayerTexture = Content.Load<Texture2D>("playerSheet");
             Globals.testBackgroundTexture = Content.Load<Texture2D>("dXdGz");
             Globals.testFont = Content.Load<SpriteFont>("font");
-            testServer = new InternalServer(false);
+            internalServer = new InternalServer(false);
 
             for (int i = 0; i < 10; i++)
             {
@@ -62,7 +62,7 @@ namespace Gridrift
                     {
                         int test = 1;
                     }
-                    chunkList.Add(Tuple.Create(j - 5, i - 5), testServer.getChunk(new World("world"), chunkID));
+                    chunkList.Add(Tuple.Create(j - 5, i - 5), internalServer.getChunk(new World("world"), chunkID));
                 }
             }
             
@@ -85,7 +85,7 @@ namespace Gridrift
                     if (!chunkList.ContainsKey(Tuple.Create(p.X + j - 1, p.Y + i - 1)))
                     {
                         Point newChunkCoords = new Point(p.X + j - 1, p.Y + i - 1);
-                        chunkList.Add(Tuple.Create(p.X + j - 1, p.Y + i - 1), testServer.getChunk(new World("world"), newChunkCoords));
+                        chunkList.Add(Tuple.Create(p.X + j - 1, p.Y + i - 1), internalServer.getChunk(new World("world"), newChunkCoords));
                     }
                 }
             }
@@ -128,6 +128,7 @@ namespace Gridrift
             }
 
             Player.update(gameTime);
+            internalServer.syncUpdate();
 
             Globals.currentWindowHeight = this.Window.ClientBounds.Height;
             Globals.currentWindowWidth = this.Window.ClientBounds.Width;
@@ -184,7 +185,7 @@ namespace Gridrift
                 spriteBatch.DrawString(Globals.testFont, "Player Chunk: x:" + p.X + " y:" + p.Y, new Vector2(cameraPos.X, cameraPos.Y + 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
                 spriteBatch.DrawString(Globals.testFont, "Chunks Loaded:" + chunkList.Count, new Vector2(cameraPos.X, cameraPos.Y + 64), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
                 spriteBatch.DrawString(Globals.testFont, "FPS:" + frameRate, new Vector2(cameraPos.X, cameraPos.Y + 96), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
-            
+                
             }
             #endregion debug
 

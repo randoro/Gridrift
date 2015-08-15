@@ -23,7 +23,7 @@ namespace Gridrift
                     }
                     else
                     {
-                        spriteBatch.Draw(Globals.testBackgroundTexture, new Vector2(position.X + j * Globals.tileLength, position.Y + i * Globals.tileLength), new Rectangle(200, 200, 32, 32), Color.Black, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.8f);
+                        spriteBatch.Draw(Globals.testBackgroundTexture, new Vector2(position.X + j * Globals.tileLength, position.Y + i * Globals.tileLength), new Rectangle(200, 200, 32, 32), Color.DarkSeaGreen, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.8f);
                 
                     }
                  }
