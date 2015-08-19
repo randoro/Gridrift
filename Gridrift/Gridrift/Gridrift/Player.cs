@@ -9,7 +9,7 @@ namespace Gridrift
 {
     static class Player
     {
-        private static Vector2 position;
+        private static Vector2 position = new Vector2(16384, 16384);
 
         private static Vector2 velocity;
 
@@ -28,22 +28,23 @@ namespace Gridrift
         /// </summary>
         public static void changeVelocity(Vector2 addedVelocity)
         {
+            int maxSpeed = 20;
             velocity += addedVelocity;
             if (velocity.X > 0)
             {
-                velocity.X = Math.Min(velocity.X, 4);
+                velocity.X = Math.Min(velocity.X, maxSpeed);
             }
             else
             {
-                velocity.X = Math.Max(velocity.X, -4);
+                velocity.X = Math.Max(velocity.X, -maxSpeed);
             }
             if (velocity.Y > 0)
             {
-                velocity.Y = Math.Min(velocity.Y, 4);
+                velocity.Y = Math.Min(velocity.Y, maxSpeed);
             }
             else
             {
-                velocity.Y = Math.Max(velocity.Y, -4);
+                velocity.Y = Math.Max(velocity.Y, -maxSpeed);
             }
         }
 

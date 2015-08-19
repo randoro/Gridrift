@@ -15,9 +15,9 @@ namespace Gridrift
         public byte terrainPopulated; //saved in file
         public byte structurePopulated; //saved in file
         public long inhabitedTime; //saved in file
-        public byte[] biomes; //saved in file
-        public byte[] blocks; //saved in file
-        public byte[] objects; //saved in file
+        public byte[] biomes = new byte[256]; //saved in file
+        public byte[] blocks = new byte[256]; //saved in file
+        public byte[] objects = new byte[256]; //saved in file
 
         /// <summary>
         ///  Holds all information a specific chunk has.
@@ -27,9 +27,6 @@ namespace Gridrift
             this.xCoordinate = xCoordinate;
             this.yCoordinate = yCoordinate;
 
-            biomes = new byte[256];
-            blocks = new byte[256];
-            objects = new byte[256];
         }
 
         public Chunk()

@@ -26,7 +26,7 @@ namespace Gridrift
             playerList = new Dictionary<String, InternalPlayer>();
             chunkList = new Dictionary<Tuple<int, int>, Chunk>();
             lastsyncUpdate = DateTime.Now.Ticks;
-            playerList.Add("offlinePlayer", new InternalPlayer(new Point(0, 0)));
+            playerList.Add("offlinePlayer", new InternalPlayer(new Point(16384, 16384)));
 
             //Console.WriteLine("0: " + Translation.regionCoordsToFirstChunkCoords(new Point(0, 0)));
             //Console.WriteLine("1: " + Translation.regionCoordsToFirstChunkCoords(new Point(1, 1)));
@@ -65,73 +65,22 @@ namespace Gridrift
                     player.setPosition(Player.getPosition());
                 }
 
-
-                foreach (KeyValuePair<Tuple<int, int>, Region> regionPair in regionList)
+                bool stillRemovingChunks = true;
+                while (stillRemovingChunks)
                 {
-                    Region region = regionPair.Value;
-                    Point regionID = new Point(regionPair.Key.Item1, regionPair.Key.Item2);
-                    Point regionFirstChunkID = Translation.regionCoordsToFirstChunkCoords(regionID);
-                    if (nowTicks > (region.lastUsedTick + (TimeSpan.TicksPerSecond * secondsTimeToLiveForRegions)))
-                    {
-                        bool shouldBeUnloaded = true;
-                        foreach (KeyValuePair<String, InternalPlayer> playerPair in playerList)
-                        {
-                            InternalPlayer currentPlayer = playerPair.Value;
-                            Point playerPosition = currentPlayer.getPosition();
-                            Point playerChunkID = Translation.exactPosToChunkCoords(playerPosition);
-                            Point playerRegionID = Translation.chunkCoordsToRegionCoords(playerChunkID);
-                            Point playerFirstChunkID = Translation.regionCoordsToFirstChunkCoords(playerRegionID);
-                            if (Translation.withinReach(regionFirstChunkID, playerFirstChunkID, 32))
-                            {
-                                region.lastUsedTick = DateTime.Now.Ticks;
-                                shouldBeUnloaded = false;
-                                break;
-                            }
-
-                        }
-
-                        if (shouldBeUnloaded)
-                        {
-                            unloadChunksOfRegion(regionID, region);
-                            region.unloadRegion();
-                            regionList.Remove(regionPair.Key); //temporary not saving lel
-                            break;
-                        }
-                    }
+                    stillRemovingChunks = unloadUnusedChunks();
                 }
 
-                foreach (KeyValuePair<Tuple<int, int>, Chunk> chunkPair in chunkList) 
+                bool stillRemovingRegions = true;
+                while (stillRemovingRegions)
                 {
-                    Point currentChunkID = new Point(chunkPair.Key.Item1, chunkPair.Key.Item2);
-
-                    bool totalWithinReach = false;
-                    foreach (KeyValuePair<String, InternalPlayer> playerPair in playerList)
-                    {
-                        if (totalWithinReach)
-                        {
-                            break;
-                        }
-                        InternalPlayer currentPlayer = playerPair.Value;
-                        Point playerPosition = currentPlayer.getPosition();
-                        Point playerChunkID = Translation.exactPosToChunkCoords(playerPosition);
-                        totalWithinReach = Translation.withinReach(playerChunkID, currentChunkID, 1);
-                    }
-
-                    if (!totalWithinReach)
-                    {
-                        //Console.WriteLine("IS chunk {" + currentChunkID.X + "," + currentChunkID.Y+"} unloaded.");
-                        Point regionID = Translation.chunkCoordsToRegionCoords(currentChunkID);
-                        Region currentRegion;
-
-                        regionList.TryGetValue(Tuple.Create(regionID.X, regionID.Y), out currentRegion);
-                        if (currentRegion != null)
-                        {
-                            currentRegion.writeChunk(chunkPair.Value);
-                        }
-                        chunkList.Remove(chunkPair.Key);
-                        break;
-                    }
+                    stillRemovingRegions = unloadUnusedRegions(nowTicks);
                 }
+                
+
+                
+
+
 
             }
         }
@@ -155,8 +104,15 @@ namespace Gridrift
             {
                 //get chunk
                 Chunk newChunk = fetchedRegion.readChunk(chunkCordinates);
-                chunkList.Add(chunkCordinatesTuple, newChunk);
-                return newChunk;
+                if (newChunk.terrainPopulated == 1)
+                {
+                    chunkList.Add(chunkCordinatesTuple, newChunk);
+                    return newChunk;
+                }
+                else
+                {
+                    return null; //continue until found
+                }
             }
             else
             {
@@ -168,8 +124,16 @@ namespace Gridrift
                     Chunk newChunk = newRegion.readChunk(chunkCordinates);
                     if (newChunk != null) 
                     {
-                    chunkList.Add(chunkCordinatesTuple, newChunk);
-                    return newChunk;
+                        if (newChunk.terrainPopulated == 1)
+                        {
+                            chunkList.Add(chunkCordinatesTuple, newChunk);
+                            return newChunk;
+                        }
+                        else
+                        {
+                            return null;
+                            throw new Exception("Could not load chunk.");
+                        }
                     }
                 }
                 else
@@ -194,14 +158,107 @@ namespace Gridrift
                     chunkList.TryGetValue(currentChunkCoord, out currentChunk);
                     if (currentChunk != null)
                     {
-                        //save chunk to region object
-                        regionToUnload.writeChunk(currentChunk);
-                        //remove from chunkList
-                        chunkList.Remove(currentChunkCoord);
+                        if (currentChunk.terrainPopulated == 0)
+                        {
+                            int test = 1;
+                        }
+                        else
+                        {
+
+                            //save chunk to region object
+                            regionToUnload.writeChunk(currentChunk);
+                            //remove from chunkList
+                            chunkList.Remove(currentChunkCoord);
+                        }
                     }
                 }
             }
         }
 
+        public bool unloadUnusedChunks()
+        {
+            bool removedChunk = false;
+            foreach (KeyValuePair<Tuple<int, int>, Chunk> chunkPair in chunkList)
+            {
+                Point currentChunkID = new Point(chunkPair.Key.Item1, chunkPair.Key.Item2);
+
+                bool totalWithinReach = false;
+                foreach (KeyValuePair<String, InternalPlayer> playerPair in playerList)
+                {
+                    if (totalWithinReach)
+                    {
+                        break;
+                    }
+                    InternalPlayer currentPlayer = playerPair.Value;
+                    Point playerPosition = currentPlayer.getPosition();
+                    Point playerChunkID = Translation.exactPosToChunkCoords(playerPosition);
+                    totalWithinReach = Translation.withinReach(playerChunkID, currentChunkID, 1);
+                }
+
+                if (!totalWithinReach)
+                {
+                    //Console.WriteLine("IS chunk {" + currentChunkID.X + "," + currentChunkID.Y+"} unloaded.");
+                    Point regionID = Translation.chunkCoordsToRegionCoords(currentChunkID);
+                    Region currentRegion;
+
+                    regionList.TryGetValue(Tuple.Create(regionID.X, regionID.Y), out currentRegion);
+                    if (currentRegion != null)
+                    {
+                        if (chunkPair.Value.terrainPopulated == 0)
+                        {
+                            int test = 1;
+                        }
+                        else
+                        {
+                            currentRegion.writeChunk(chunkPair.Value);
+                        }
+                    }
+                    removedChunk = true;
+                    chunkList.Remove(chunkPair.Key);
+                    break;
+                }
+            }
+            return removedChunk;
+        }
+
+        public bool unloadUnusedRegions(long nowTicks)
+        {
+            bool removedRegion = false;
+            foreach (KeyValuePair<Tuple<int, int>, Region> regionPair in regionList)
+            {
+                Region region = regionPair.Value;
+                Point regionID = new Point(regionPair.Key.Item1, regionPair.Key.Item2);
+                Point regionFirstChunkID = Translation.regionCoordsToFirstChunkCoords(regionID);
+                if (nowTicks > (region.lastUsedTick + (TimeSpan.TicksPerSecond * secondsTimeToLiveForRegions)))
+                {
+                    bool shouldBeUnloaded = true;
+                    foreach (KeyValuePair<String, InternalPlayer> playerPair in playerList)
+                    {
+                        InternalPlayer currentPlayer = playerPair.Value;
+                        Point playerPosition = currentPlayer.getPosition();
+                        Point playerChunkID = Translation.exactPosToChunkCoords(playerPosition);
+                        Point playerRegionID = Translation.chunkCoordsToRegionCoords(playerChunkID);
+                        Point playerFirstChunkID = Translation.regionCoordsToFirstChunkCoords(playerRegionID);
+                        if (Translation.withinReach(regionFirstChunkID, playerFirstChunkID, 32))
+                        {
+                            region.lastUsedTick = DateTime.Now.Ticks;
+                            shouldBeUnloaded = false;
+                            break;
+                        }
+
+                    }
+
+                    if (shouldBeUnloaded)
+                    {
+                        removedRegion = true;
+                        unloadChunksOfRegion(regionID, region);
+                        region.unloadRegion();
+                        regionList.Remove(regionPair.Key); //temporary not saving lel
+                        break;
+                    }
+                }
+            }
+            return removedRegion;
+        }
     }
 }

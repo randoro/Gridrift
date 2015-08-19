@@ -100,7 +100,7 @@ namespace Gridrift
                 if (chunkSizeInBytesInt < 4096) 
                 {
                     //update regionScheme
-                    int chunkPositionInFileInt = (1024 * 3) + (chunkIDInArrays * 4096);
+                    int chunkPositionInFileInt = (1024 + (4096 * 2)) + (chunkIDInArrays * 4096);
                     chunkPositionInFile[chunkIDInArrays] = chunkPositionInFileInt;
                     chunkSizeInBytes[chunkIDInArrays] = chunkSizeInBytesInt;
                     chunkIsPresent[chunkIDInArrays] = 1;
@@ -122,6 +122,7 @@ namespace Gridrift
         public void unloadRegion()
         {
             saveRegionScheme();
+            fileStream.Flush();
             fileStream.Close();
         }
 

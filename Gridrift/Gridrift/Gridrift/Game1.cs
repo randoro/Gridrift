@@ -84,7 +84,14 @@ namespace Gridrift
                     if (!chunkList.ContainsKey(Tuple.Create(p.X + j - 1, p.Y + i - 1)))
                     {
                         Point newChunkCoords = new Point(p.X + j - 1, p.Y + i - 1);
-                        chunkList.Add(Tuple.Create(p.X + j - 1, p.Y + i - 1), internalServer.getChunk(new World("world"), newChunkCoords));
+                        Chunk newChunk = internalServer.getChunk(new World("world"), newChunkCoords);
+                        if (newChunk != null)
+                        {
+                            if (newChunk.terrainPopulated == 1)
+                            {
+                                chunkList.Add(Tuple.Create(p.X + j - 1, p.Y + i - 1), newChunk);
+                            }
+                        }
                     }
                 }
             }
@@ -120,21 +127,22 @@ namespace Gridrift
                 graphics.ToggleFullScreen();
             }
 
+            float multiplier = 1.0f; //almost not noticable
             if (Keyboard.GetState().IsKeyDown(Keys.A))
             {
-                Player.changeVelocity(new Vector2(-0.7f, 0));
+                Player.changeVelocity(new Vector2(-0.7f * multiplier, 0));
             }
             else if (Keyboard.GetState().IsKeyDown(Keys.D))
             {
-                Player.changeVelocity(new Vector2(0.7f, 0));
+                Player.changeVelocity(new Vector2(0.7f * multiplier, 0));
             }
             if (Keyboard.GetState().IsKeyDown(Keys.W))
             {
-                Player.changeVelocity(new Vector2(0,-0.7f));
+                Player.changeVelocity(new Vector2(0, -0.7f * multiplier));
             }
             else if (Keyboard.GetState().IsKeyDown(Keys.S))
             {
-                Player.changeVelocity(new Vector2(0, 0.7f));
+                Player.changeVelocity(new Vector2(0, 0.7f * multiplier));
             }
 
             Player.update(gameTime);
