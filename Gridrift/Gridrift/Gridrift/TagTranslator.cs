@@ -294,46 +294,45 @@ namespace Gridrift
         public static byte[] saveChunk(Chunk chunk)
         {
             int position = 0;
-            int bufferSize = 1024;
+            int bufferSize = 4096;
             byte[] buffer = new byte[bufferSize];
 
-            Tag chunkTag = new Tag(TagID.Compound, "chunk", null);
-            writeTag(chunkTag, ref buffer, ref position);
-
+            List<Tag> chunkTagList = new List<Tag>();
+            
             byte[] chunkXpos = BitConverter.GetBytes(chunk.xCoordinate);
             Tag XPos = new Tag(TagID.Int, "XPos", chunkXpos);
-            writeTag(XPos, ref buffer, ref position);
+            chunkTagList.Add(XPos);
 
             byte[] chunkYpos = BitConverter.GetBytes(chunk.yCoordinate);
             Tag YPos = new Tag(TagID.Int, "YPos", chunkYpos);
-            writeTag(YPos, ref buffer, ref position);
+            chunkTagList.Add(YPos);
 
             byte[] chunkLastUpdate = BitConverter.GetBytes(chunk.lastUpdate);
             Tag LastUpdate = new Tag(TagID.Long, "LastUpdate", chunkLastUpdate);
-            writeTag(LastUpdate, ref buffer, ref position);
+            chunkTagList.Add(LastUpdate);
 
             byte terrainByte = (byte)chunk.terrainPopulated;
             byte[] chunkTerrainPopulated = { terrainByte };
             Tag TerrainPopulated = new Tag(TagID.Byte, "TerrainPopulated", chunkTerrainPopulated);
-            writeTag(TerrainPopulated, ref buffer, ref position);
+            chunkTagList.Add(TerrainPopulated);
 
             byte structureByte = chunk.structurePopulated;
             byte[] chunkStructurePopulated = { structureByte };
             Tag StructurePopulated = new Tag(TagID.Byte, "StructurePopulated", chunkStructurePopulated);
-            writeTag(StructurePopulated, ref buffer, ref position);
+            chunkTagList.Add(StructurePopulated);
 
             byte[] chunkInhabitedTime = BitConverter.GetBytes(chunk.inhabitedTime);
             Tag InhabitedTime = new Tag(TagID.Long, "InhabitedTime", chunkInhabitedTime);
-            writeTag(InhabitedTime, ref buffer, ref position);
+            chunkTagList.Add(InhabitedTime);
 
             Tag Biomes = new Tag(TagID.ByteArray, "Biomes", chunk.biomes);
-            writeTag(Biomes, ref buffer, ref position);
+            chunkTagList.Add(Biomes);
 
             Tag Blocks = new Tag(TagID.ByteArray, "Blocks", chunk.blocks);
-            writeTag(Blocks, ref buffer, ref position);
+            chunkTagList.Add(Blocks);
 
             Tag Objects = new Tag(TagID.ByteArray, "Objects", chunk.objects);
-            writeTag(Objects, ref buffer, ref position);
+            chunkTagList.Add(Objects);
 
             //Tag Entities = new Tag(TagID.List, "Entities", chunk.entities, TagID.Compound);
             //writeTag(Entities, fileStream);
@@ -344,8 +343,21 @@ namespace Gridrift
             //Tag TileEntities = new Tag(TagID.List, "TileEntities", chunk.tileEntities, TagID.Compound);
             //writeTag(TileEntities, fileStream);
 
-            Tag End = new Tag(TagID.End, null, null);
-            writeTag(End, ref buffer, ref position);
+            //Tag End = new Tag(TagID.End, null, null);
+
+            Tag chunkTag = new Tag(TagID.Compound, "chunk", chunkTagList, TagID.Compound);
+
+            writeTag(chunkTag, ref buffer, ref position);
+            writeTag(XPos, ref buffer, ref position);
+            writeTag(YPos, ref buffer, ref position);
+            writeTag(LastUpdate, ref buffer, ref position);
+            writeTag(TerrainPopulated, ref buffer, ref position);
+            writeTag(StructurePopulated, ref buffer, ref position);
+            writeTag(InhabitedTime, ref buffer, ref position);
+            writeTag(Biomes, ref buffer, ref position);
+            writeTag(Blocks, ref buffer, ref position);
+            writeTag(Objects, ref buffer, ref position);
+            //writeTag(End, ref buffer, ref position);
 
             byte[] trimmedBuffer = new byte[position];
             Array.Copy(buffer, 0, trimmedBuffer, 0, position);
@@ -355,7 +367,7 @@ namespace Gridrift
 
         public static Tag readTag(byte[] chunkData, ref int position)
         {
-            TagID tagID = (TagID)readPayloadBasicType(chunkData, ref position, sizeof(byte))[0];
+            TagID tagID = (TagID)readPayloadBasicType(chunkData, ref position, sizeof(byte), "firsttag")[0];
             Tag returnTag;
 
             if (tagID.Equals(TagID.End))
@@ -366,11 +378,11 @@ namespace Gridrift
             }
 
             //get length of string
-            byte[] byte2 = readPayloadBasicType(chunkData, ref position, sizeof(short));
+            byte[] byte2 = readPayloadBasicType(chunkData, ref position, sizeof(short),"secondtag");
             short stringLength = BitConverter.ToInt16(byte2, 0);
 
             //get string
-            byte[] byteString = readPayloadBasicType(chunkData, ref position, sizeof(char) * stringLength);
+            byte[] byteString = readPayloadBasicType(chunkData, ref position, sizeof(byte) * stringLength, "thirdtag");
             String tagIdentifier = Encoding.UTF8.GetString(byteString, 0, stringLength);
 
             byte[] payload;
@@ -384,59 +396,52 @@ namespace Gridrift
                     break;
                 case TagID.Byte:
 
-                    payload = readPayloadBasicType(chunkData, ref position, sizeof(byte));
+                    payload = readPayloadBasicType(chunkData, ref position, sizeof(byte), tagIdentifier);
                     returnTag = new Tag(tagID, tagIdentifier, payload);
                     return returnTag;
 
                     break;
                 case TagID.Short:
 
-                    payload = readPayloadBasicType(chunkData, ref position, sizeof(short));
+                    payload = readPayloadBasicType(chunkData, ref position, sizeof(short), tagIdentifier);
                     returnTag = new Tag(tagID, tagIdentifier, payload);
                     return returnTag;
 
                     break;
                 case TagID.Int:
 
-                    payload = readPayloadBasicType(chunkData, ref position, sizeof(int));
+                    payload = readPayloadBasicType(chunkData, ref position, sizeof(int), tagIdentifier);
                     returnTag = new Tag(tagID, tagIdentifier, payload);
                     return returnTag;
 
                     break;
                 case TagID.Long:
 
-                    payload = readPayloadBasicType(chunkData, ref position, sizeof(long));
+                    payload = readPayloadBasicType(chunkData, ref position, sizeof(long), tagIdentifier);
                     returnTag = new Tag(tagID, tagIdentifier, payload);
                     return returnTag;
 
                     break;
                 case TagID.Float:
 
-                    payload = readPayloadBasicType(chunkData, ref position, sizeof(float));
+                    payload = readPayloadBasicType(chunkData, ref position, sizeof(float), tagIdentifier);
                     returnTag = new Tag(tagID, tagIdentifier, payload);
                     return returnTag;
 
                     break;
                 case TagID.Double:
 
-                    payload = readPayloadBasicType(chunkData, ref position, sizeof(double));
+                    payload = readPayloadBasicType(chunkData, ref position, sizeof(double), tagIdentifier);
                     returnTag = new Tag(tagID, tagIdentifier, payload);
                     return returnTag;
 
                     break;
                 case TagID.ByteArray:
 
-                    byte[] sizeArray = readPayloadBasicType(chunkData, ref position, sizeof(int));
+                    byte[] sizeArray = readPayloadBasicType(chunkData, ref position, sizeof(int), tagIdentifier);
                     int arraySizeNumber = BitConverter.ToInt32(sizeArray, 0);
 
-                    payload = new byte[sizeof(int) + arraySizeNumber]; //get payload of array
-
-                    //copy length header
-                    Array.Copy(sizeArray, 0, payload, 0, sizeof(int));
-
-                    //copy payload
-                    byte[] payloadNoLength = readPayloadBasicType(chunkData, ref position, sizeof(byte) * arraySizeNumber);
-                    Array.Copy(payloadNoLength, 0, payload, sizeof(int), sizeof(byte) * arraySizeNumber);
+                    payload = readPayloadBasicType(chunkData, ref position, sizeof(byte) * arraySizeNumber, tagIdentifier);
 
                     returnTag = new Tag(tagID, tagIdentifier, payload);
                     return returnTag;
@@ -444,7 +449,7 @@ namespace Gridrift
                     break;
                 case TagID.String:
 
-                    byte[] sizeArray2 = readPayloadBasicType(chunkData, ref position, sizeof(short));
+                    byte[] sizeArray2 = readPayloadBasicType(chunkData, ref position, sizeof(short), tagIdentifier);
                     short stringSizeNumber = BitConverter.ToInt16(sizeArray2, 0);
 
                     payload = new byte[sizeof(short) + stringSizeNumber]; //get payload of string
@@ -452,7 +457,7 @@ namespace Gridrift
                     //copy length header
                     Array.Copy(sizeArray2, 0, payload, 0, sizeof(short));
 
-                    byte[] payloadNoLength2 = readPayloadBasicType(chunkData, ref position, sizeof(char) * stringSizeNumber);
+                    byte[] payloadNoLength2 = readPayloadBasicType(chunkData, ref position, sizeof(char) * stringSizeNumber, tagIdentifier);
                     Array.Copy(payloadNoLength2, 0, payload, sizeof(short), sizeof(char) * stringSizeNumber);
 
                     returnTag = new Tag(tagID, tagIdentifier, payload);
@@ -462,10 +467,10 @@ namespace Gridrift
                 case TagID.List:
 
                     //get element type
-                    TagID elementType = (TagID)readPayloadBasicType(chunkData, ref position, sizeof(byte))[0];
+                    TagID elementType = (TagID)readPayloadBasicType(chunkData, ref position, sizeof(byte), tagIdentifier)[0];
 
                     //get list length
-                    byte[] elementLengthArray = readPayloadBasicType(chunkData, ref position, sizeof(int));
+                    byte[] elementLengthArray = readPayloadBasicType(chunkData, ref position, sizeof(int), tagIdentifier);
 
                     int elementsInList = BitConverter.ToInt32(elementLengthArray, 0); //number of elements
                     //List<List<Tag>> tagListList = new List<List<Tag>>();
@@ -652,7 +657,7 @@ namespace Gridrift
                     break;
                 case TagID.IntArray:
 
-                    byte[] sizeArray3 = readPayloadBasicType(chunkData, ref position, sizeof(int));
+                    byte[] sizeArray3 = readPayloadBasicType(chunkData, ref position, sizeof(int), tagIdentifier);
                     int arraySizeNumber3 = BitConverter.ToInt32(sizeArray3, 0);
 
                     payload = new byte[sizeof(int) + arraySizeNumber3 * sizeof(int)]; //get payload of array
@@ -661,7 +666,7 @@ namespace Gridrift
                     Array.Copy(sizeArray3, 0, payload, 0, sizeof(int));
 
                     //copy payload
-                    byte[] payloadNoLength3 = readPayloadBasicType(chunkData, ref position, sizeof(int) * arraySizeNumber3);
+                    byte[] payloadNoLength3 = readPayloadBasicType(chunkData, ref position, sizeof(int) * arraySizeNumber3, tagIdentifier);
                     Array.Copy(payloadNoLength3, 0, payload, sizeof(int), sizeof(int) * arraySizeNumber3);
 
                     returnTag = new Tag(tagID, tagIdentifier, payload);
@@ -951,7 +956,7 @@ namespace Gridrift
         }
 
 
-        private static byte[] readPayloadBasicType(byte[] chunkData, ref int position, int sizeOf)
+        private static byte[] readPayloadBasicType(byte[] chunkData, ref int position, int sizeOf, String tagIdentifier)
         {
             byte[] payload = new byte[sizeOf];
             Array.Copy(chunkData, position, payload, 0, sizeOf);
@@ -961,14 +966,14 @@ namespace Gridrift
 
         private static void writePayloadBasicType(byte[] toBeWritten, ref byte[] chunkData, ref int position, int sizeOf)
         {
-            Array.Copy(toBeWritten, 0, toBeWritten, position, sizeOf);
+            Array.Copy(toBeWritten, 0, chunkData, position, sizeOf);
             position += sizeOf;
         }
 
         public static void writeTag(Tag tag, ref byte[] chunkData, ref int position)
         {
             TagID tagID = tag.getID();
-            byte[] tagIDbytes = new byte[0];
+            byte[] tagIDbytes = new byte[1];
             tagIDbytes[0] = (byte)tagID;
             writePayloadBasicType(tagIDbytes, ref chunkData, ref position, sizeof(byte));
 
@@ -978,6 +983,11 @@ namespace Gridrift
             }
 
             String tagName = tag.getName();
+            short stringLength = (short)tagName.Length;
+
+            byte[] tagNameLengthBytes = BitConverter.GetBytes(stringLength);
+            writePayloadBasicType(tagNameLengthBytes, ref chunkData, ref position, sizeof(short));
+
             byte[] tagNameBytes = Encoding.UTF8.GetBytes(tagName);
             writePayloadBasicType(tagNameBytes, ref chunkData, ref position, tagNameBytes.Length);
 
@@ -1021,11 +1031,11 @@ namespace Gridrift
                     case TagID.ByteArray:
                         //using payload byte array
                         payload = tag.getPayload();
-                        int tempPosition = 0;
-                        byte[] arrayLength = readPayloadBasicType(payload, ref tempPosition, sizeof(int));
-                        int arraySizeNumber = BitConverter.ToInt32(arrayLength, 0);
+                        int payloadLength = payload.Length;
+                        byte[] payloadLengthBytes = BitConverter.GetBytes(payloadLength);
+                        writePayloadBasicType(payloadLengthBytes, ref chunkData, ref position,sizeof(int));
 
-                        writePayloadBasicType(payload, ref chunkData, ref position, sizeof(int) + (sizeof(byte) * arraySizeNumber));
+                        writePayloadBasicType(payload, ref chunkData, ref position, (sizeof(byte) * payloadLength));
                         break;
                     case TagID.List:
                         //using payloadList
@@ -1068,7 +1078,7 @@ namespace Gridrift
                         //using payload byte array
                         payload = tag.getPayload();
                         int tempPosition2 = 0;
-                        byte[] arrayLength2 = readPayloadBasicType(payload, ref tempPosition2, sizeof(short));
+                        byte[] arrayLength2 = readPayloadBasicType(payload, ref tempPosition2, sizeof(short), tagName);
                         short arraySizeNumber2 = BitConverter.ToInt16(arrayLength2, 0);
 
                         writePayloadBasicType(payload, ref chunkData, ref position, sizeof(short) + (sizeof(char) * arraySizeNumber2));
@@ -1077,7 +1087,7 @@ namespace Gridrift
                         //using payload byte array
                         payload = tag.getPayload();
                         int tempPosition3 = 0;
-                        byte[] arrayLength3 = readPayloadBasicType(payload, ref tempPosition3, sizeof(int));
+                        byte[] arrayLength3 = readPayloadBasicType(payload, ref tempPosition3, sizeof(int), tagName);
                         int arraySizeNumber3 = BitConverter.ToInt32(arrayLength3, 0);
 
                         writePayloadBasicType(payload, ref chunkData, ref position, sizeof(int) + (sizeof(int) * arraySizeNumber3));

@@ -12,29 +12,34 @@ namespace Gridrift
         public bool isOnline;
         public static World testWorld = new World("world");
         Dictionary<Tuple<int,int>, Region> regionList;
+        Dictionary<Tuple<int, int>, Chunk> chunkList;
         Dictionary<String, InternalPlayer> playerList;
         long lastsyncUpdate;
         private const int secondsTimeToLiveForRegions = 5;
+        public static int ISchunkCount = 0;
+        public static int ISregionCount = 0;
 
         public InternalServer(bool online)
         {
             isOnline = online;
             regionList = new Dictionary<Tuple<int, int>, Region>();
             playerList = new Dictionary<String, InternalPlayer>();
+            chunkList = new Dictionary<Tuple<int, int>, Chunk>();
             lastsyncUpdate = DateTime.Now.Ticks;
-            playerList.Add("offlinePlayer", new InternalPlayer(Tuple.Create(0, 0)));
-            //Console.WriteLine("0: "+Translation.chunkCoordsToInternalRegionChunkCoords(new Point(0, 0)));
-            //Console.WriteLine("1: " + Translation.chunkCoordsToInternalRegionChunkCoords(new Point(1, 1)));
-            //Console.WriteLine("31: " + Translation.chunkCoordsToInternalRegionChunkCoords(new Point(31, 31)));
-            //Console.WriteLine("32: " + Translation.chunkCoordsToInternalRegionChunkCoords(new Point(32, 32)));
-            //Console.WriteLine("33: " + Translation.chunkCoordsToInternalRegionChunkCoords(new Point(33, 33)));
+            playerList.Add("offlinePlayer", new InternalPlayer(new Point(0, 0)));
+
+            //Console.WriteLine("0: " + Translation.regionCoordsToFirstChunkCoords(new Point(0, 0)));
+            //Console.WriteLine("1: " + Translation.regionCoordsToFirstChunkCoords(new Point(1, 1)));
+            //Console.WriteLine("31: " + Translation.regionCoordsToFirstChunkCoords(new Point(31, 31)));
+            //Console.WriteLine("32: " + Translation.regionCoordsToFirstChunkCoords(new Point(32, 32)));
+            //Console.WriteLine("33: " + Translation.regionCoordsToFirstChunkCoords(new Point(33, 33)));
 
 
-            //Console.WriteLine("-1: " + Translation.chunkCoordsToInternalRegionChunkCoords(new Point(-1, -1)));
-            //Console.WriteLine("-2: " + Translation.chunkCoordsToInternalRegionChunkCoords(new Point(-2, -2)));
-            //Console.WriteLine("-32: " + Translation.chunkCoordsToInternalRegionChunkCoords(new Point(-32, -32)));
-            //Console.WriteLine("-33: " + Translation.chunkCoordsToInternalRegionChunkCoords(new Point(-33, -33)));
-            //Console.WriteLine("-34: " + Translation.chunkCoordsToInternalRegionChunkCoords(new Point(-34, -34)));
+            //Console.WriteLine("-1: " + Translation.regionCoordsToFirstChunkCoords(new Point(-1, -1)));
+            //Console.WriteLine("-2: " + Translation.regionCoordsToFirstChunkCoords(new Point(-2, -2)));
+            //Console.WriteLine("-32: " + Translation.regionCoordsToFirstChunkCoords(new Point(-32, -32)));
+            //Console.WriteLine("-33: " + Translation.regionCoordsToFirstChunkCoords(new Point(-33, -33)));
+            //Console.WriteLine("-34: " + Translation.regionCoordsToFirstChunkCoords(new Point(-34, -34)));
 
         }
 
@@ -45,17 +50,85 @@ namespace Gridrift
             if (nowTicks > (lastsyncUpdate + (TimeSpan.TicksPerSecond) / 20))
             {
                 lastsyncUpdate = lastsyncUpdate + (TimeSpan.TicksPerSecond / 20);
-
+                //Console.WriteLine(" ");
+                //Console.WriteLine("Chunks in IS chunkList: " + chunkList.Count);
+                //Console.WriteLine("Regions in IS regionList: " + regionList.Count);
                 //Make changes - this happens 20 times per second ideally
-                foreach (KeyValuePair<Tuple<int, int>, Region> pair in regionList)
+
+                ISchunkCount = chunkList.Count;
+                ISregionCount = regionList.Count;
+
+                InternalPlayer player;
+                playerList.TryGetValue("offlinePlayer", out player);
+                if (player != null)
                 {
-                    Region region = pair.Value;
-                    Point regionID = new Point(pair.Key.Item1, pair.Key.Item2);
+                    player.setPosition(Player.getPosition());
+                }
+
+
+                foreach (KeyValuePair<Tuple<int, int>, Region> regionPair in regionList)
+                {
+                    Region region = regionPair.Value;
+                    Point regionID = new Point(regionPair.Key.Item1, regionPair.Key.Item2);
+                    Point regionFirstChunkID = Translation.regionCoordsToFirstChunkCoords(regionID);
                     if (nowTicks > (region.lastUsedTick + (TimeSpan.TicksPerSecond * secondsTimeToLiveForRegions)))
                     {
-                        Console.WriteLine("Region x:" + regionID.X + " y:" + regionID.Y + " TTL expired, unloading.");
-                        region.unloadRegion();
-                        regionList.Remove(pair.Key); //temporary not saving lel
+                        bool shouldBeUnloaded = true;
+                        foreach (KeyValuePair<String, InternalPlayer> playerPair in playerList)
+                        {
+                            InternalPlayer currentPlayer = playerPair.Value;
+                            Point playerPosition = currentPlayer.getPosition();
+                            Point playerChunkID = Translation.exactPosToChunkCoords(playerPosition);
+                            Point playerRegionID = Translation.chunkCoordsToRegionCoords(playerChunkID);
+                            Point playerFirstChunkID = Translation.regionCoordsToFirstChunkCoords(playerRegionID);
+                            if (Translation.withinReach(regionFirstChunkID, playerFirstChunkID, 32))
+                            {
+                                region.lastUsedTick = DateTime.Now.Ticks;
+                                shouldBeUnloaded = false;
+                                break;
+                            }
+
+                        }
+
+                        if (shouldBeUnloaded)
+                        {
+                            unloadChunksOfRegion(regionID, region);
+                            region.unloadRegion();
+                            regionList.Remove(regionPair.Key); //temporary not saving lel
+                            break;
+                        }
+                    }
+                }
+
+                foreach (KeyValuePair<Tuple<int, int>, Chunk> chunkPair in chunkList) 
+                {
+                    Point currentChunkID = new Point(chunkPair.Key.Item1, chunkPair.Key.Item2);
+
+                    bool totalWithinReach = false;
+                    foreach (KeyValuePair<String, InternalPlayer> playerPair in playerList)
+                    {
+                        if (totalWithinReach)
+                        {
+                            break;
+                        }
+                        InternalPlayer currentPlayer = playerPair.Value;
+                        Point playerPosition = currentPlayer.getPosition();
+                        Point playerChunkID = Translation.exactPosToChunkCoords(playerPosition);
+                        totalWithinReach = Translation.withinReach(playerChunkID, currentChunkID, 1);
+                    }
+
+                    if (!totalWithinReach)
+                    {
+                        //Console.WriteLine("IS chunk {" + currentChunkID.X + "," + currentChunkID.Y+"} unloaded.");
+                        Point regionID = Translation.chunkCoordsToRegionCoords(currentChunkID);
+                        Region currentRegion;
+
+                        regionList.TryGetValue(Tuple.Create(regionID.X, regionID.Y), out currentRegion);
+                        if (currentRegion != null)
+                        {
+                            currentRegion.writeChunk(chunkPair.Value);
+                        }
+                        chunkList.Remove(chunkPair.Key);
                         break;
                     }
                 }
@@ -67,7 +140,13 @@ namespace Gridrift
 
         public Chunk getChunk(World world, Point chunkCordinates)
         {
-            Console.WriteLine("Regions in InternalServer regionList: "+regionList.Count);
+            Chunk alreadyLoadedChunk;
+            Tuple<int, int> chunkCordinatesTuple = Tuple.Create(chunkCordinates.X, chunkCordinates.Y);
+            if (chunkList.TryGetValue(chunkCordinatesTuple, out alreadyLoadedChunk)) 
+            {
+                return alreadyLoadedChunk;
+            }
+            //Console.WriteLine("Regions in InternalServer regionList: "+regionList.Count);
 
             Point regionValue = Translation.chunkCoordsToRegionCoords(chunkCordinates);
             Region fetchedRegion;
@@ -75,7 +154,9 @@ namespace Gridrift
             if (regionInDictionary)
             {
                 //get chunk
-                return fetchedRegion.getChunk(chunkCordinates);
+                Chunk newChunk = fetchedRegion.readChunk(chunkCordinates);
+                chunkList.Add(chunkCordinatesTuple, newChunk);
+                return newChunk;
             }
             else
             {
@@ -84,16 +165,43 @@ namespace Gridrift
                 if (newRegion != null)
                 {
                     regionList.Add(Tuple.Create(regionValue.X, regionValue.Y), newRegion);
-                    return newRegion.getChunk(chunkCordinates);
+                    Chunk newChunk = newRegion.readChunk(chunkCordinates);
+                    if (newChunk != null) 
+                    {
+                    chunkList.Add(chunkCordinatesTuple, newChunk);
+                    return newChunk;
+                    }
                 }
                 else
                 {
-                    getChunk(world, chunkCordinates);
+                    throw new Exception("Could not load region file.");
                 }
             }
             return null;
         }
 
+
+        public void unloadChunksOfRegion(Point regionID, Region regionToUnload)
+        {
+            Point firstChunkCoord = Translation.regionCoordsToFirstChunkCoords(regionID);
+            for (int i = 0; i < 32; i++)
+            {
+                for (int j = 0; j < 32; j++)
+                {
+                    //Point currentChunkCoord = new Point(firstChunkCoord.X + j, firstChunkCoord.Y + i);
+                    Tuple<int, int> currentChunkCoord = Tuple.Create(firstChunkCoord.X + j, firstChunkCoord.Y + i);
+                    Chunk currentChunk;
+                    chunkList.TryGetValue(currentChunkCoord, out currentChunk);
+                    if (currentChunk != null)
+                    {
+                        //save chunk to region object
+                        regionToUnload.writeChunk(currentChunk);
+                        //remove from chunkList
+                        chunkList.Remove(currentChunkCoord);
+                    }
+                }
+            }
+        }
 
     }
 }

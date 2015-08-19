@@ -52,7 +52,7 @@ namespace Gridrift
 
         }
 
-        public Chunk getChunk(Point chunkID)
+        public Chunk readChunk(Point chunkID)
         {
             Point checkingRegionID = Translation.chunkCoordsToRegionCoords(chunkID);
             lastUsedTick = DateTime.Now.Ticks;
@@ -83,8 +83,45 @@ namespace Gridrift
             
         }
 
+        public void writeChunk(Chunk chunkToWrite)
+        {
+            Point chunkID = new Point(chunkToWrite.xCoordinate, chunkToWrite.yCoordinate);
+            Point checkingRegionID = Translation.chunkCoordsToRegionCoords(chunkID);
+            lastUsedTick = DateTime.Now.Ticks;
+
+            //Makes sure the chunk is inside this specific region
+            if (regionID.X == checkingRegionID.X && regionID.Y == checkingRegionID.Y)
+            {
+                Point internalChunkPos = Translation.chunkCoordsToInternalRegionChunkCoords(chunkID);
+                int chunkIDInArrays = internalChunkPos.X + internalChunkPos.Y * 32;
+                
+                byte[] chunkData = TagTranslator.saveChunk(chunkToWrite);
+                int chunkSizeInBytesInt = chunkData.Length;
+                if (chunkSizeInBytesInt < 4096) 
+                {
+                    //update regionScheme
+                    int chunkPositionInFileInt = (1024 * 3) + (chunkIDInArrays * 4096);
+                    chunkPositionInFile[chunkIDInArrays] = chunkPositionInFileInt;
+                    chunkSizeInBytes[chunkIDInArrays] = chunkSizeInBytesInt;
+                    chunkIsPresent[chunkIDInArrays] = 1;
+                    //write to filestream
+                    pushByteArray(chunkData, chunkPositionInFileInt, chunkSizeInBytesInt);
+
+                }
+                else 
+                {
+                    throw new System.Exception("Chunk size too big. (Equal to or above 1024 bytes)");
+                }
+            }
+            else
+            {
+                throw new System.Exception("Trying to save a chunk in wrong region file.");
+            }
+        }
+
         public void unloadRegion()
         {
+            saveRegionScheme();
             fileStream.Close();
         }
 
@@ -152,7 +189,7 @@ namespace Gridrift
         private void pushByteArray(byte[] array, int position, int length)
         {
             fileStream.Position = position;
-            fileStream.Write(array, position, length);
+            fileStream.Write(array, 0, length);
         }
 
         private void pushInt32Array(int[] array, int position, int length)

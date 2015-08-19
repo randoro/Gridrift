@@ -53,18 +53,18 @@ namespace Gridrift
             Globals.testFont = Content.Load<SpriteFont>("font");
             internalServer = new InternalServer(false);
 
-            for (int i = 0; i < 10; i++)
-            {
-                for (int j = 0; j < 10; j++)
-                {
-                    Point chunkID = new Point(j - 5, i - 5);
-                    if (chunkID.X == 0 && chunkID.Y == 0)
-                    {
-                        int test = 1;
-                    }
-                    chunkList.Add(Tuple.Create(j - 5, i - 5), internalServer.getChunk(new World("world"), chunkID));
-                }
-            }
+            //for (int i = 0; i < 10; i++)
+            //{
+            //    for (int j = 0; j < 10; j++)
+            //    {
+            //        Point chunkID = new Point(j - 5, i - 5);
+            //        if (chunkID.X == 0 && chunkID.Y == 0)
+            //        {
+            //            int test = 1;
+            //        }
+            //        chunkList.Add(Tuple.Create(j - 5, i - 5), internalServer.getChunk(new World("world"), chunkID));
+            //    }
+            //}
             
             
         }
@@ -75,7 +75,6 @@ namespace Gridrift
 
         protected override void Update(GameTime gameTime)
         {
-
             Point p = Translation.exactPosToChunkCoords(Player.getPosition());
 
             for (int i = 0; i < 3; i++)
@@ -87,6 +86,17 @@ namespace Gridrift
                         Point newChunkCoords = new Point(p.X + j - 1, p.Y + i - 1);
                         chunkList.Add(Tuple.Create(p.X + j - 1, p.Y + i - 1), internalServer.getChunk(new World("world"), newChunkCoords));
                     }
+                }
+            }
+            foreach (KeyValuePair<Tuple<int, int>, Chunk> chunkPair in chunkList)
+            {
+                Point currentChunkID = new Point(chunkPair.Key.Item1, chunkPair.Key.Item2);
+                bool withinReach = Translation.withinReach(p, currentChunkID, 1);
+                if (!withinReach)
+                {
+                    //Console.WriteLine("Chunks in C chunkList: " + chunkList.Count);
+                    chunkList.Remove(chunkPair.Key);
+                    break;
                 }
             }
 
@@ -181,10 +191,18 @@ namespace Gridrift
                 Point playerPos = Player.getPosition();
                 Vector2 cameraPos = Camera.cameraPosition();
                 int frameRate = Utility.CalculateFrameRate();
-                spriteBatch.DrawString(Globals.testFont, "Player: x:" + playerPos.X + " y:" + playerPos.Y, new Vector2(cameraPos.X, cameraPos.Y), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
-                spriteBatch.DrawString(Globals.testFont, "Player Chunk: x:" + p.X + " y:" + p.Y, new Vector2(cameraPos.X, cameraPos.Y + 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
-                spriteBatch.DrawString(Globals.testFont, "Chunks Loaded:" + chunkList.Count, new Vector2(cameraPos.X, cameraPos.Y + 64), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
-                spriteBatch.DrawString(Globals.testFont, "FPS:" + frameRate, new Vector2(cameraPos.X, cameraPos.Y + 96), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                int offset = 0;
+                spriteBatch.DrawString(Globals.testFont, "Player: x:" + playerPos.X + " y:" + playerPos.Y, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                offset += 32;
+                spriteBatch.DrawString(Globals.testFont, "Player Chunk: x:" + p.X + " y:" + p.Y, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                offset += 32;
+                spriteBatch.DrawString(Globals.testFont, "Client Chunks Loaded:" + chunkList.Count, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                offset += 32;
+                spriteBatch.DrawString(Globals.testFont, "FPS:" + frameRate, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                offset += 32;
+                spriteBatch.DrawString(Globals.testFont, "IS Chunks Loaded:" + InternalServer.ISchunkCount, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                offset += 32;
+                spriteBatch.DrawString(Globals.testFont, "IS Regions Loaded:" + InternalServer.ISregionCount, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
                 
             }
             #endregion debug

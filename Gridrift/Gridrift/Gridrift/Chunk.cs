@@ -27,7 +27,9 @@ namespace Gridrift
             this.xCoordinate = xCoordinate;
             this.yCoordinate = yCoordinate;
 
+            biomes = new byte[256];
             blocks = new byte[256];
+            objects = new byte[256];
         }
 
         public Chunk()
