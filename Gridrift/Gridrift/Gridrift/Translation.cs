@@ -77,7 +77,7 @@ namespace Gridrift
             }
             else
             {
-                returnPoint.X = (int)regionCoords.X * 33 + 1;
+                returnPoint.X = (int)regionCoords.X * 32 - 1;
             }
 
             if (regionCoords.Y >= 0)
@@ -86,7 +86,7 @@ namespace Gridrift
             }
             else
             {
-                returnPoint.Y = (int)regionCoords.Y * 33 + 1;
+                returnPoint.Y = (int)regionCoords.Y * 32 - 1;
             }
 
             return returnPoint;
@@ -97,25 +97,40 @@ namespace Gridrift
         /// </summary>
         public static Point chunkCoordsToInternalRegionChunkCoords(Point chunkCords)
         {
-            Point returnPoint = new Point(0, 0);
-            if (chunkCords.X >= 0)
+            Point regionID = Translation.chunkCoordsToRegionCoords(chunkCords);
+            Point firstChunk = Translation.regionCoordsToFirstChunkCoords(regionID);
+
+            Point internalDifference = new Point(chunkCords.X - firstChunk.X, chunkCords.Y - firstChunk.Y);
+
+            if (internalDifference.X > 0)
             {
-                returnPoint.X = (int)chunkCords.X  % 32;
-            }
-            else
-            {
-                returnPoint.X = (32 + ((int)chunkCords.X) % 32) % 32;
-            }
-            if (chunkCords.Y >= 0)
-            {
-                returnPoint.Y = (int)chunkCords.Y % 32;
-            }
-            else
-            {
-                returnPoint.Y = (32 + ((int)chunkCords.Y) % 32) % 32;
+                internalDifference.X--;
             }
 
-            return returnPoint;
+            if (internalDifference.Y > 0)
+            {
+                internalDifference.Y--;
+            }
+
+            //Point returnPoint = new Point(0, 0);
+            //if (chunkCords.X >= 0)
+            //{
+            //    returnPoint.X = (int)chunkCords.X  % 32;
+            //}
+            //else
+            //{
+            //    returnPoint.X = (32 - ((int)chunkCords.X + 1) % 32); //% 32);
+            //}
+            //if (chunkCords.Y >= 0)
+            //{
+            //    returnPoint.Y = (int)chunkCords.Y % 32;
+            //}
+            //else
+            //{
+            //    returnPoint.Y = 32 + ((int)chunkCords.Y) % 33;
+            //}
+
+            return internalDifference;
         }
 
         /// <summary>

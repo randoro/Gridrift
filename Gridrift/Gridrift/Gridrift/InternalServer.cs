@@ -85,6 +85,25 @@ namespace Gridrift
             }
         }
 
+        public void closeServer()
+        {
+            playerList.Remove("offlinePlayer");
+
+            bool stillRemovingChunks = true;
+            while (stillRemovingChunks)
+            {
+                stillRemovingChunks = unloadUnusedChunks();
+            }
+
+            bool stillRemovingRegions = true;
+            while (stillRemovingRegions)
+            {
+                stillRemovingRegions = unloadUnusedRegions(DateTime.Now.Ticks);
+            }
+                
+
+        }
+
         
 
         public Chunk getChunk(World world, Point chunkCordinates)
@@ -97,6 +116,10 @@ namespace Gridrift
             }
             //Console.WriteLine("Regions in InternalServer regionList: "+regionList.Count);
 
+            if (chunkCordinates.X == -65 && chunkCordinates.Y == -65)
+            {
+                int test1 = 1;
+            }
             Point regionValue = Translation.chunkCoordsToRegionCoords(chunkCordinates);
             Region fetchedRegion;
             bool regionInDictionary = regionList.TryGetValue(Tuple.Create(regionValue.X, regionValue.Y), out fetchedRegion);

@@ -70,6 +70,8 @@ namespace Gridrift
         }
         protected override void UnloadContent()
         {
+            internalServer.closeServer();
+
 
         }
 
