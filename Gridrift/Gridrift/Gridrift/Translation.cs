@@ -21,7 +21,8 @@ namespace Gridrift
             }
             else
             {
-                returnPoint.X = (int)position.X / 512 - 1;
+                returnPoint.X = (int)((position.X + 1) / 512) - 1;
+                //returnPoint.X = (int)position.X / 512 - 1;
             }
 
             if (position.Y >= 0)
@@ -30,7 +31,8 @@ namespace Gridrift
             }
             else
             {
-                returnPoint.Y = (int)position.Y / 512 - 1;
+                returnPoint.Y = (int)((position.Y + 1) / 512) - 1;
+                //returnPoint.Y = (int)position.Y / 512 - 1;
             }
 
             return returnPoint;
@@ -49,7 +51,7 @@ namespace Gridrift
             }
             else
             {
-                returnPoint.X = (int)chunkCoords.X / 33 - 1;
+                returnPoint.X = (int)((chunkCoords.X + 1) / 32) - 1;
             }
 
             if (chunkCoords.Y >= 0)
@@ -58,7 +60,7 @@ namespace Gridrift
             }
             else
             {
-                returnPoint.Y = (int)chunkCoords.Y / 33 - 1;
+                returnPoint.Y = (int)((chunkCoords.Y + 1) / 32) - 1;
             }
 
             return returnPoint;
@@ -69,27 +71,8 @@ namespace Gridrift
         /// </summary>
         public static Point regionCoordsToFirstChunkCoords(Point regionCoords)
         {
+             return new Point(regionCoords.X * 32, regionCoords.Y * 32);
 
-            Point returnPoint = new Point(0, 0);
-            if (regionCoords.X >= 0)
-            {
-                returnPoint.X = (int)regionCoords.X * 32;
-            }
-            else
-            {
-                returnPoint.X = (int)regionCoords.X * 32 - 1;
-            }
-
-            if (regionCoords.Y >= 0)
-            {
-                returnPoint.Y = (int)regionCoords.Y * 32;
-            }
-            else
-            {
-                returnPoint.Y = (int)regionCoords.Y * 32 - 1;
-            }
-
-            return returnPoint;
         }
 
         /// <summary>
@@ -99,38 +82,9 @@ namespace Gridrift
         {
             Point regionID = Translation.chunkCoordsToRegionCoords(chunkCords);
             Point firstChunk = Translation.regionCoordsToFirstChunkCoords(regionID);
+            
+            return new Point(chunkCords.X - firstChunk.X, chunkCords.Y - firstChunk.Y);
 
-            Point internalDifference = new Point(chunkCords.X - firstChunk.X, chunkCords.Y - firstChunk.Y);
-
-            if (internalDifference.X > 0)
-            {
-                internalDifference.X--;
-            }
-
-            if (internalDifference.Y > 0)
-            {
-                internalDifference.Y--;
-            }
-
-            //Point returnPoint = new Point(0, 0);
-            //if (chunkCords.X >= 0)
-            //{
-            //    returnPoint.X = (int)chunkCords.X  % 32;
-            //}
-            //else
-            //{
-            //    returnPoint.X = (32 - ((int)chunkCords.X + 1) % 32); //% 32);
-            //}
-            //if (chunkCords.Y >= 0)
-            //{
-            //    returnPoint.Y = (int)chunkCords.Y % 32;
-            //}
-            //else
-            //{
-            //    returnPoint.Y = 32 + ((int)chunkCords.Y) % 33;
-            //}
-
-            return internalDifference;
         }
 
         /// <summary>
@@ -141,36 +95,24 @@ namespace Gridrift
             int xDifference;
             int yDifference;
 
-            //if (position1.X <= position2.X)
-            //{
-                //xDifference = position2.X - position1.X;
-            //}
-            //else
-           // {
                 xDifference = position1.X - position2.X;
                 int absX = Math.Abs(xDifference);
-            //}
                 if (absX > reach)
-            {
-                //x out of reach
-                return false;
-            }
-            //if (position1.Y <= position2.Y)
-            //{
-            //    yDifference = position2.Y - position1.Y;
-            //}
-            //else
-            //{
+                {
+                    //x out of reach
+                    return false;
+                }
+
                 yDifference = position1.Y - position2.Y;
                 int absY = Math.Abs(yDifference);
-            //}
                 if (absY > reach)
-            {
-                //y out of reach
-                return false;
-            }
-            //both x and y are within reach
-            return true;
+                {
+                    //y out of reach
+                    return false;
+                }
+
+                //both x and y are within reach
+                return true;
         }
     }
 }

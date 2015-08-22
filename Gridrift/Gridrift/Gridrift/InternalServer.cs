@@ -116,10 +116,6 @@ namespace Gridrift
             }
             //Console.WriteLine("Regions in InternalServer regionList: "+regionList.Count);
 
-            if (chunkCordinates.X == -65 && chunkCordinates.Y == -65)
-            {
-                int test1 = 1;
-            }
             Point regionValue = Translation.chunkCoordsToRegionCoords(chunkCordinates);
             Region fetchedRegion;
             bool regionInDictionary = regionList.TryGetValue(Tuple.Create(regionValue.X, regionValue.Y), out fetchedRegion);
@@ -183,7 +179,7 @@ namespace Gridrift
                     {
                         if (currentChunk.terrainPopulated == 0)
                         {
-                            int test = 1;
+                            throw new Exception("Trying to unload unfinished Chunk");
                         }
                         else
                         {
@@ -215,7 +211,7 @@ namespace Gridrift
                     InternalPlayer currentPlayer = playerPair.Value;
                     Point playerPosition = currentPlayer.getPosition();
                     Point playerChunkID = Translation.exactPosToChunkCoords(playerPosition);
-                    totalWithinReach = Translation.withinReach(playerChunkID, currentChunkID, 1);
+                    totalWithinReach = Translation.withinReach(playerChunkID, currentChunkID, 3);
                 }
 
                 if (!totalWithinReach)

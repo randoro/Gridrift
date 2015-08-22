@@ -18,6 +18,8 @@ namespace Gridrift
         Dictionary<Tuple<int, int>, Chunk> chunkList;
         Queue<Tuple<int, int>> chunkQueue;
         InternalServer internalServer;
+        Point chunkLoadRange = new Point(5, 3); //set to 5,5 for more lag but no glapping
+        Point offset = new Point(2, 1); //set to 2,2 for more lag but no glapping
 
         #region debug
         bool debuggingActive = false;
@@ -77,21 +79,21 @@ namespace Gridrift
 
         protected override void Update(GameTime gameTime)
         {
-            Point p = Translation.exactPosToChunkCoords(Player.getPosition());
+            Point currentChunkCoords = Translation.exactPosToChunkCoords(Player.getPosition());
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < chunkLoadRange.Y; i++)
             {
-                for (int j = 0; j < 3; j++)
+                for (int j = 0; j < chunkLoadRange.X; j++)
                 {
-                    if (!chunkList.ContainsKey(Tuple.Create(p.X + j - 1, p.Y + i - 1)))
+                    if (!chunkList.ContainsKey(Tuple.Create(currentChunkCoords.X + j - offset.X, currentChunkCoords.Y + i - offset.Y)))
                     {
-                        Point newChunkCoords = new Point(p.X + j - 1, p.Y + i - 1);
+                        Point newChunkCoords = new Point(currentChunkCoords.X + j - offset.X, currentChunkCoords.Y + i - offset.Y);
                         Chunk newChunk = internalServer.getChunk(new World("world"), newChunkCoords);
                         if (newChunk != null)
                         {
                             if (newChunk.terrainPopulated == 1)
                             {
-                                chunkList.Add(Tuple.Create(p.X + j - 1, p.Y + i - 1), newChunk);
+                                chunkList.Add(Tuple.Create(currentChunkCoords.X + j - offset.X, currentChunkCoords.Y + i - offset.Y), newChunk);
                             }
                         }
                     }
@@ -100,7 +102,7 @@ namespace Gridrift
             foreach (KeyValuePair<Tuple<int, int>, Chunk> chunkPair in chunkList)
             {
                 Point currentChunkID = new Point(chunkPair.Key.Item1, chunkPair.Key.Item2);
-                bool withinReach = Translation.withinReach(p, currentChunkID, 1);
+                bool withinReach = Translation.withinReach(currentChunkCoords, currentChunkID, offset.X);
                 if (!withinReach)
                 {
                     //Console.WriteLine("Chunks in C chunkList: " + chunkList.Count);
@@ -170,16 +172,17 @@ namespace Gridrift
             spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateTranslation(Globals.currentWindowWidth / 2 - Player.getPosition().X, Globals.currentWindowHeight / 2 - Player.getPosition().Y, 0));
 
             Point p = Translation.exactPosToChunkCoords(Player.getPosition());
-
-            for (int i = 0; i < 3; i++)
+            int chunksdrawn = 0;
+            for (int i = 0; i < chunkLoadRange.Y; i++)
             {
-                for (int j = 0; j < 3; j++)
+                for (int j = 0; j < chunkLoadRange.X; j++)
                 {
-                    if (chunkList.ContainsKey(Tuple.Create(p.X + j - 1, p.Y + i - 1)))
+                    if (chunkList.ContainsKey(Tuple.Create(p.X + j - offset.X, p.Y + i - offset.Y)))
                     {
-                        Chunk chu = chunkList[Tuple.Create(p.X + j - 1, p.Y + i - 1)];
+                        Chunk chu = chunkList[Tuple.Create(p.X + j - offset.X, p.Y + i - offset.Y)];
                         if (chu != null)
                         {
+                            chunksdrawn++;
                             chu.draw(spriteBatch);
                         }
                     }
@@ -209,6 +212,8 @@ namespace Gridrift
                 spriteBatch.DrawString(Globals.testFont, "Client Chunks Loaded:" + chunkList.Count, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
                 offset += 32;
                 spriteBatch.DrawString(Globals.testFont, "FPS:" + frameRate, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                offset += 32;
+                spriteBatch.DrawString(Globals.testFont, "Chunks Drawn:" + chunksdrawn, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
                 offset += 32;
                 spriteBatch.DrawString(Globals.testFont, "IS Chunks Loaded:" + InternalServer.ISchunkCount, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
                 offset += 32;
