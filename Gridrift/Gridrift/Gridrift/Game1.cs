@@ -8,6 +8,9 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using Gridrift.Server;
+using Gridrift.Utility;
+using Gridrift.Rendering;
 
 namespace Gridrift
 {
@@ -217,7 +220,7 @@ namespace Gridrift
             {
                 Point playerPos = Player.getPosition();
                 Vector2 cameraPos = Camera.cameraPosition();
-                int frameRate = Utility.CalculateFrameRate();
+                int frameRate = FrameCounter.CalculateFrameRate();
                 int offset = 0;
                 spriteBatch.DrawString(Globals.testFont, "Player: x:" + playerPos.X + " y:" + playerPos.Y, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
                 offset += 32;

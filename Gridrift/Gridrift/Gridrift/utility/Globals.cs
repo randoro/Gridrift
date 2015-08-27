@@ -5,10 +5,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace Gridrift
+namespace Gridrift.Utility
 {
-    public enum Direction { None, North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest }
-    public enum TagID { End, Byte, Short, Int, Long, Float, Double, ByteArray, String, List, Compound, IntArray };
 
     /// <summary>
     ///  Global Objects and variables.

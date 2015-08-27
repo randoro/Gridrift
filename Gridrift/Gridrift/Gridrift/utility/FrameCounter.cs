@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Gridrift
+namespace Gridrift.Utility
 {
-    public class Utility
+    public class FrameCounter
     {
         #region Basic Frame Counter
 

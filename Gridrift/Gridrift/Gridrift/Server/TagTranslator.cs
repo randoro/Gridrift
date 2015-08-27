@@ -4,8 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Gridrift.Utility;
 
-namespace Gridrift
+namespace Gridrift.Server
 {
     static class TagTranslator
     {

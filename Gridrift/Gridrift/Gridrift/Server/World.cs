@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Gridrift.Utility;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Gridrift
+namespace Gridrift.Server
 {
     public class World
     {

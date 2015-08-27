@@ -1,11 +1,13 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Gridrift.Rendering;
+using Gridrift.Utility;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace Gridrift
+namespace Gridrift.Server
 {
     class InternalServer
     {

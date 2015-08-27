@@ -1,11 +1,12 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Gridrift.Utility;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Gridrift
+namespace Gridrift.Server
 {
     public class Region
     {

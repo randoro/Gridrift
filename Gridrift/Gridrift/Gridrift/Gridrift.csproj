@@ -72,25 +72,27 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="internalserver\AntiCheat.cs" />
-    <Compile Include="rendering\Camera.cs" />
-    <Compile Include="internalserver\Chunk.cs" />
-    <Compile Include="internalserver\FileLoader.cs" />
-    <Compile Include="internalserver\Generator.cs" />
-    <Compile Include="utility\Globals.cs" />
-    <Compile Include="internalserver\InternalPlayer.cs" />
-    <Compile Include="internalserver\InternalServer.cs" />
-    <Compile Include="rendering\Player.cs" />
+    <Compile Include="Server\AntiCheat.cs" />
+    <Compile Include="Server\Packets\Packet.cs" />
+    <Compile Include="Rendering\Camera.cs" />
+    <Compile Include="Server\Chunk.cs" />
+    <Compile Include="Server\FileLoader.cs" />
+    <Compile Include="Server\Generator.cs" />
+    <Compile Include="Utility\Enums.cs" />
+    <Compile Include="Utility\Globals.cs" />
+    <Compile Include="Server\InternalPlayer.cs" />
+    <Compile Include="Server\InternalServer.cs" />
+    <Compile Include="Rendering\Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Game1.cs" />
-    <Compile Include="internalserver\Region.cs" />
-    <Compile Include="rendering\RenderTarget.cs" />
-    <Compile Include="internalserver\Tag.cs" />
-    <Compile Include="internalserver\TagTranslator.cs" />
-    <Compile Include="utility\Translation.cs" />
-    <Compile Include="utility\Utility.cs" />
-    <Compile Include="internalserver\World.cs" />
+    <Compile Include="Server\Region.cs" />
+    <Compile Include="Rendering\RenderTarget.cs" />
+    <Compile Include="Server\Tag.cs" />
+    <Compile Include="Server\TagTranslator.cs" />
+    <Compile Include="Utility\Translation.cs" />
+    <Compile Include="Utility\FrameCounter.cs" />
+    <Compile Include="Server\World.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />
