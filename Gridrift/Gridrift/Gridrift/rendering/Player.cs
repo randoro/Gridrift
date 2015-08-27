@@ -9,7 +9,7 @@ namespace Gridrift
 {
     static class Player
     {
-        private static Vector2 position = new Vector2(16384, 16384);
+        private static Vector2 position = new Vector2(0, 0);
 
         private static Vector2 velocity;
 
@@ -22,13 +22,18 @@ namespace Gridrift
         {
             return new Point((int)position.X, (int)position.Y);
         }
+        public static void setPosition(Point newPosition)
+        {
+            position.X = (float)newPosition.X;
+            position.Y = (float)newPosition.Y;
+        }
 
         /// <summary>
         ///  Adds a direction velocity to the entity
         /// </summary>
         public static void changeVelocity(Vector2 addedVelocity)
         {
-            int maxSpeed = 20;
+            int maxSpeed = 3;
             velocity += addedVelocity;
             if (velocity.X > 0)
             {

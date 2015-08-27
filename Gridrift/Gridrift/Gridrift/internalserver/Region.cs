@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using ZLibNet;
 
 namespace Gridrift
 {
@@ -35,20 +34,6 @@ namespace Gridrift
             //saveRegionScheme();
             loadRegionScheme();
             int test = 0;
-            //Zipper z = new Zipper();
-            //z.ZipFile = @"d:\test\my.zip";
-            ////z.ItemList.Add(name);
-            //z.PathInZip = enPathInZip.Relative;
-            //z.Recurse = true;
-            //z.Zip();
-
-            //UnZipper uz = new UnZipper();
-            //uz.Destination = @"d:\test\out\";
-            //uz.IfFileExist = enIfFileExist.Exception;
-            //uz.ItemList.Add("*.*");
-            //uz.Recurse = true;
-            //uz.ZipFile = @"d:\test\my.zip";
-            //uz.UnZip();
 
         }
 

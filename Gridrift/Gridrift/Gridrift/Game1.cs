@@ -20,6 +20,7 @@ namespace Gridrift
         InternalServer internalServer;
         Point chunkLoadRange = new Point(5, 3); //set to 5,5 for more lag but no glapping
         Point offset = new Point(2, 1); //set to 2,2 for more lag but no glapping
+        long lastsyncUpdate;
 
         #region debug
         bool debuggingActive = false;
@@ -54,6 +55,7 @@ namespace Gridrift
             Globals.testBackgroundTexture = Content.Load<Texture2D>("dXdGz");
             Globals.testFont = Content.Load<SpriteFont>("font");
             internalServer = new InternalServer(false);
+            lastsyncUpdate = DateTime.Now.Ticks;
 
             //for (int i = 0; i < 10; i++)
             //{
@@ -79,38 +81,7 @@ namespace Gridrift
 
         protected override void Update(GameTime gameTime)
         {
-            Point currentChunkCoords = Translation.exactPosToChunkCoords(Player.getPosition());
-
-            for (int i = 0; i < chunkLoadRange.Y; i++)
-            {
-                for (int j = 0; j < chunkLoadRange.X; j++)
-                {
-                    if (!chunkList.ContainsKey(Tuple.Create(currentChunkCoords.X + j - offset.X, currentChunkCoords.Y + i - offset.Y)))
-                    {
-                        Point newChunkCoords = new Point(currentChunkCoords.X + j - offset.X, currentChunkCoords.Y + i - offset.Y);
-                        Chunk newChunk = internalServer.getChunk(new World("world"), newChunkCoords);
-                        if (newChunk != null)
-                        {
-                            if (newChunk.terrainPopulated == 1)
-                            {
-                                chunkList.Add(Tuple.Create(currentChunkCoords.X + j - offset.X, currentChunkCoords.Y + i - offset.Y), newChunk);
-                            }
-                        }
-                    }
-                }
-            }
-            foreach (KeyValuePair<Tuple<int, int>, Chunk> chunkPair in chunkList)
-            {
-                Point currentChunkID = new Point(chunkPair.Key.Item1, chunkPair.Key.Item2);
-                bool withinReach = Translation.withinReach(currentChunkCoords, currentChunkID, offset.X);
-                if (!withinReach)
-                {
-                    //Console.WriteLine("Chunks in C chunkList: " + chunkList.Count);
-                    chunkList.Remove(chunkPair.Key);
-                    break;
-                }
-            }
-
+            syncUpdate();
 
 
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -161,6 +132,49 @@ namespace Gridrift
 
 
             base.Update(gameTime);
+        }
+
+
+        public void syncUpdate()
+        {
+            DateTime now = DateTime.Now;
+            long nowTicks = now.Ticks;
+            if (nowTicks > (lastsyncUpdate + (TimeSpan.TicksPerSecond) / 20))
+            {
+                lastsyncUpdate = lastsyncUpdate + (TimeSpan.TicksPerSecond / 20);
+
+                Point currentChunkCoords = Translation.exactPosToChunkCoords(Player.getPosition());
+
+                for (int i = 0; i < chunkLoadRange.Y; i++)
+                {
+                    for (int j = 0; j < chunkLoadRange.X; j++)
+                    {
+                        if (!chunkList.ContainsKey(Tuple.Create(currentChunkCoords.X + j - offset.X, currentChunkCoords.Y + i - offset.Y)))
+                        {
+                            Point newChunkCoords = new Point(currentChunkCoords.X + j - offset.X, currentChunkCoords.Y + i - offset.Y);
+                            Chunk newChunk = internalServer.getChunk(new World("world"), newChunkCoords);
+                            if (newChunk != null)
+                            {
+                                if (newChunk.terrainPopulated == 1)
+                                {
+                                    chunkList.Add(Tuple.Create(currentChunkCoords.X + j - offset.X, currentChunkCoords.Y + i - offset.Y), newChunk);
+                                }
+                            }
+                        }
+                    }
+                }
+                foreach (KeyValuePair<Tuple<int, int>, Chunk> chunkPair in chunkList)
+                {
+                    Point currentChunkID = new Point(chunkPair.Key.Item1, chunkPair.Key.Item2);
+                    bool withinReach = Translation.withinReach(currentChunkCoords, currentChunkID, offset.X);
+                    if (!withinReach)
+                    {
+                        //Console.WriteLine("Chunks in C chunkList: " + chunkList.Count);
+                        chunkList.Remove(chunkPair.Key);
+                        break;
+                    }
+                }
+            }
         }
 
         protected override void Draw(GameTime gameTime)

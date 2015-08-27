@@ -70,39 +70,33 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Net" />
-    <Reference Include="zlibnet, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>libs\zlibnet.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Camera.cs" />
-    <Compile Include="Chunk.cs" />
-    <Compile Include="FileLoader.cs" />
-    <Compile Include="Generator.cs" />
+    <Compile Include="internalserver\AntiCheat.cs" />
+    <Compile Include="rendering\Camera.cs" />
+    <Compile Include="internalserver\Chunk.cs" />
+    <Compile Include="internalserver\FileLoader.cs" />
+    <Compile Include="internalserver\Generator.cs" />
     <Compile Include="Globals.cs" />
-    <Compile Include="InternalPlayer.cs" />
-    <Compile Include="InternalServer.cs" />
-    <Compile Include="Player.cs" />
+    <Compile Include="internalserver\InternalPlayer.cs" />
+    <Compile Include="internalserver\InternalServer.cs" />
+    <Compile Include="rendering\Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Game1.cs" />
-    <Compile Include="Region.cs" />
-    <Compile Include="RenderTarget.cs" />
-    <Compile Include="Tag.cs" />
-    <Compile Include="TagTranslator.cs" />
+    <Compile Include="internalserver\Region.cs" />
+    <Compile Include="rendering\RenderTarget.cs" />
+    <Compile Include="internalserver\Tag.cs" />
+    <Compile Include="internalserver\TagTranslator.cs" />
     <Compile Include="Translation.cs" />
     <Compile Include="Utility.cs" />
-    <Compile Include="World.cs" />
+    <Compile Include="internalserver\World.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />
     <Content Include="GameThumbnail.png">
       <XnaPlatformSpecific>true</XnaPlatformSpecific>
     </Content>
-    <None Include="libs\zlib32.dll" />
-    <None Include="libs\zlib64.dll" />
-    <None Include="libs\zlibnet.dll" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GridriftContent\GridriftContent.contentproj">

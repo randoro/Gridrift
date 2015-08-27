@@ -26,7 +26,7 @@ namespace Gridrift
             playerList = new Dictionary<String, InternalPlayer>();
             chunkList = new Dictionary<Tuple<int, int>, Chunk>();
             lastsyncUpdate = DateTime.Now.Ticks;
-            playerList.Add("offlinePlayer", new InternalPlayer(new Point(16384, 16384)));
+            playerList.Add("offlinePlayer", new InternalPlayer(Player.getPosition(), DateTime.Now.Ticks));
 
             //Console.WriteLine("0: " + Translation.regionCoordsToFirstChunkCoords(new Point(0, 0)));
             //Console.WriteLine("1: " + Translation.regionCoordsToFirstChunkCoords(new Point(1, 1)));
@@ -62,7 +62,12 @@ namespace Gridrift
                 playerList.TryGetValue("offlinePlayer", out player);
                 if (player != null)
                 {
-                    player.setPosition(Player.getPosition());
+                    bool isCheating = AntiCheat.checkAndChangePlayerPosition(player, Player.getPosition(), DateTime.Now.Ticks);
+                    if (isCheating)
+                    {
+                        Console.WriteLine("player: offlinePlayer is moving too fast");
+                    }
+                    
                 }
 
                 bool stillRemovingChunks = true;
