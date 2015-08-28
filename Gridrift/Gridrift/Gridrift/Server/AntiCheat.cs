@@ -26,14 +26,14 @@ namespace Gridrift.Server
             double tilesPerSecondX = ((double)difference.X) / seconds;
             double tilesPerSecondY = ((double)difference.Y) / seconds;
 
-            if (tilesPerSecondX > 300)
+            if (tilesPerSecondX > 2000)
             {
                 //is traveling too fast
                 Player.setPosition(oldLocation);
                 player.setLocationTimeStamp(newTimeStamp);
                 return true;
             }
-            if (tilesPerSecondY > 300)
+            if (tilesPerSecondY > 2000)
             {
                 //is traveling too fast
                 Player.setPosition(oldLocation);

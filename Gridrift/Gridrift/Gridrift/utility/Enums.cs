@@ -9,9 +9,9 @@ namespace Gridrift.Utility
 
     public enum TagID { End, Byte, Short, Int, Long, Float, Double, ByteArray, String, List, Compound, IntArray };
 
-    public enum PacketID { empty, keepAlive, getChunk };
+    public enum PacketID { empty, keepAlive, requestChunk, sendChunk };
 
-
+    public enum gameState { menu, playing }
 
     public static class Enums
     {

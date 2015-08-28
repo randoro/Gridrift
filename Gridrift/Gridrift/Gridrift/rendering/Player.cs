@@ -34,7 +34,7 @@ namespace Gridrift.Rendering
         /// </summary>
         public static void changeVelocity(Vector2 addedVelocity)
         {
-            int maxSpeed = 3;
+            int maxSpeed = 30;
             velocity += addedVelocity;
             if (velocity.X > 0)
             {

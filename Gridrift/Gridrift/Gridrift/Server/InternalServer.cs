@@ -20,6 +20,8 @@ namespace Gridrift.Server
         private const int secondsTimeToLiveForRegions = 5;
         public static int ISchunkCount = 0;
         public static int ISregionCount = 0;
+        public bool isRunning;
+        private Object serverLock = new Object();
 
         public InternalServer(bool online)
         {
@@ -42,6 +44,20 @@ namespace Gridrift.Server
             //Console.WriteLine("-32: " + Translation.regionCoordsToFirstChunkCoords(new Point(-32, -32)));
             //Console.WriteLine("-33: " + Translation.regionCoordsToFirstChunkCoords(new Point(-33, -33)));
             //Console.WriteLine("-34: " + Translation.regionCoordsToFirstChunkCoords(new Point(-34, -34)));
+
+        }
+
+        public void startServer()
+        {
+            isRunning = true;
+
+            while (isRunning)
+            {
+                lock (serverLock)
+                {
+                    syncUpdate();
+                }
+            }
 
         }
 
@@ -68,6 +84,7 @@ namespace Gridrift.Server
                     if (isCheating)
                     {
                         Console.WriteLine("player: offlinePlayer is moving too fast");
+                        
                     }
                     
                 }
@@ -115,59 +132,62 @@ namespace Gridrift.Server
 
         public Chunk getChunk(World world, Point chunkCordinates)
         {
-            Chunk alreadyLoadedChunk;
-            Tuple<int, int> chunkCordinatesTuple = Tuple.Create(chunkCordinates.X, chunkCordinates.Y);
-            if (chunkList.TryGetValue(chunkCordinatesTuple, out alreadyLoadedChunk)) 
+            lock (serverLock)
             {
-                return alreadyLoadedChunk;
-            }
-            //Console.WriteLine("Regions in InternalServer regionList: "+regionList.Count);
+                Chunk alreadyLoadedChunk;
+                Tuple<int, int> chunkCordinatesTuple = Tuple.Create(chunkCordinates.X, chunkCordinates.Y);
+                if (chunkList.TryGetValue(chunkCordinatesTuple, out alreadyLoadedChunk))
+                {
+                    return alreadyLoadedChunk;
+                }
+                //Console.WriteLine("Regions in InternalServer regionList: "+regionList.Count);
 
-            Point regionValue = Translation.chunkCoordsToRegionCoords(chunkCordinates);
-            Region fetchedRegion;
-            bool regionInDictionary = regionList.TryGetValue(Tuple.Create(regionValue.X, regionValue.Y), out fetchedRegion);
-            if (regionInDictionary)
-            {
-                //get chunk
-                Chunk newChunk = fetchedRegion.readChunk(chunkCordinates);
-                if (newChunk.terrainPopulated == 1)
+                Point regionValue = Translation.chunkCoordsToRegionCoords(chunkCordinates);
+                Region fetchedRegion;
+                bool regionInDictionary = regionList.TryGetValue(Tuple.Create(regionValue.X, regionValue.Y), out fetchedRegion);
+                if (regionInDictionary)
                 {
-                    chunkList.Add(chunkCordinatesTuple, newChunk);
-                    return newChunk;
-                }
-                else
-                {
-                    return null; //continue until found
-                }
-            }
-            else
-            {
-                //load region
-                Region newRegion = FileLoader.loadRegionFile(world, regionValue);
-                if (newRegion != null)
-                {
-                    regionList.Add(Tuple.Create(regionValue.X, regionValue.Y), newRegion);
-                    Chunk newChunk = newRegion.readChunk(chunkCordinates);
-                    if (newChunk != null) 
+                    //get chunk
+                    Chunk newChunk = fetchedRegion.readChunk(chunkCordinates);
+                    if (newChunk.terrainPopulated == 1)
                     {
-                        if (newChunk.terrainPopulated == 1)
-                        {
-                            chunkList.Add(chunkCordinatesTuple, newChunk);
-                            return newChunk;
-                        }
-                        else
-                        {
-                            return null;
-                            throw new Exception("Could not load chunk.");
-                        }
+                        chunkList.Add(chunkCordinatesTuple, newChunk);
+                        return newChunk;
+                    }
+                    else
+                    {
+                        return null; //continue until found
                     }
                 }
                 else
                 {
-                    throw new Exception("Could not load region file.");
+                    //load region
+                    Region newRegion = FileLoader.loadRegionFile(world, regionValue);
+                    if (newRegion != null)
+                    {
+                        regionList.Add(Tuple.Create(regionValue.X, regionValue.Y), newRegion);
+                        Chunk newChunk = newRegion.readChunk(chunkCordinates);
+                        if (newChunk != null)
+                        {
+                            if (newChunk.terrainPopulated == 1)
+                            {
+                                chunkList.Add(chunkCordinatesTuple, newChunk);
+                                return newChunk;
+                            }
+                            else
+                            {
+                                return null;
+                                throw new Exception("Could not load chunk.");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("Could not load region file.");
+                    }
                 }
+                return null;
             }
-            return null;
         }
 
 

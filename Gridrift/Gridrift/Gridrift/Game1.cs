@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Media;
 using Gridrift.Server;
 using Gridrift.Utility;
 using Gridrift.Rendering;
+using System.Threading;
 
 namespace Gridrift
 {
@@ -21,6 +22,7 @@ namespace Gridrift
         Dictionary<Tuple<int, int>, Chunk> chunkList;
         Queue<Tuple<int, int>> chunkQueue;
         InternalServer internalServer;
+        Thread singlePlayerServer;
         Point chunkLoadRange = new Point(5, 3); //set to 5,5 for more lag but no glapping
         Point offset = new Point(2, 1); //set to 2,2 for more lag but no glapping
         long lastsyncUpdate;
@@ -58,8 +60,11 @@ namespace Gridrift
             Globals.testBackgroundTexture = Content.Load<Texture2D>("dXdGz");
             Globals.testFont = Content.Load<SpriteFont>("font");
             internalServer = new InternalServer(false);
+            singlePlayerServer = new Thread(new ThreadStart(internalServer.startServer));
+            singlePlayerServer.Start();
             lastsyncUpdate = DateTime.Now.Ticks;
 
+           
             //for (int i = 0; i < 10; i++)
             //{
             //    for (int j = 0; j < 10; j++)
@@ -77,7 +82,9 @@ namespace Gridrift
         }
         protected override void UnloadContent()
         {
+            internalServer.isRunning = false;
             internalServer.closeServer();
+            singlePlayerServer.Abort();
 
 
         }
@@ -102,7 +109,7 @@ namespace Gridrift
 
             if (Keyboard.GetState().IsKeyDown(Keys.Space))
             {
-                graphics.ToggleFullScreen();
+                
             }
 
             float multiplier = 1.0f; //almost not noticable
@@ -124,7 +131,6 @@ namespace Gridrift
             }
 
             Player.update(gameTime);
-            internalServer.syncUpdate();
 
             Globals.currentWindowHeight = this.Window.ClientBounds.Height;
             Globals.currentWindowWidth = this.Window.ClientBounds.Width;
