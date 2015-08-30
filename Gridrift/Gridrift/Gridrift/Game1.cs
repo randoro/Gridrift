@@ -12,6 +12,7 @@ using Gridrift.Server;
 using Gridrift.Utility;
 using Gridrift.Rendering;
 using System.Threading;
+using Gridrift.Server.Packets;
 
 namespace Gridrift
 {
@@ -20,9 +21,11 @@ namespace Gridrift
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Dictionary<Tuple<int, int>, Chunk> chunkList;
-        Queue<Tuple<int, int>> chunkQueue;
         InternalServer internalServer;
+        //ClientConnection packetHandler;
         Thread singlePlayerServer;
+        //Thread packetHandlerThread;
+        AsyncClient asyncClient;
         Point chunkLoadRange = new Point(5, 3); //set to 5,5 for more lag but no glapping
         Point offset = new Point(2, 1); //set to 2,2 for more lag but no glapping
         long lastsyncUpdate;
@@ -55,13 +58,26 @@ namespace Gridrift
         {
             this.IsMouseVisible = true;
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            chunkQueue = new Queue<Tuple<int, int>>();
             Globals.testPlayerTexture = Content.Load<Texture2D>("playerSheet");
             Globals.testBackgroundTexture = Content.Load<Texture2D>("dXdGz");
             Globals.testFont = Content.Load<SpriteFont>("font");
             internalServer = new InternalServer(false);
+            //packetHandler = new ClientConnection("notused", 13000);
+            //packetHandler.addPacket(new Packet(PacketID.requestChunk, new byte[3]));
             singlePlayerServer = new Thread(new ThreadStart(internalServer.startServer));
             singlePlayerServer.Start();
+
+            asyncClient = new AsyncClient();
+            asyncClient.StartClient();
+
+            asyncClient.Send("Test", false);
+            asyncClient.Send("Test", false);
+            asyncClient.Send("Test", false);
+
+            
+            //packetHandlerThread = new Thread(new ThreadStart(packetHandler.start));
+            //packetHandlerThread.Start();
+
             lastsyncUpdate = DateTime.Now.Ticks;
 
            
@@ -82,11 +98,25 @@ namespace Gridrift
         }
         protected override void UnloadContent()
         {
+            asyncClient.Dispose();
+
+            
+
             internalServer.isRunning = false;
             internalServer.closeServer();
             singlePlayerServer.Abort();
 
+            
+            //packetHandler.isRunning = false;
+            //packetHandlerThread.Abort();
 
+
+
+        }
+
+        public void sendFunction(IAsyncClient a, bool close)
+        {
+            Console.WriteLine("Message recieved: " + close);
         }
 
         protected override void Update(GameTime gameTime)
@@ -109,7 +139,9 @@ namespace Gridrift
 
             if (Keyboard.GetState().IsKeyDown(Keys.Space))
             {
-                
+                asyncClient.Send("Test", false);
+                //ClientMessageSubmittedHandler simpleDelegate = new ClientMessageSubmittedHandler(sendFunction);
+                //simpleDelegate(null, false);
             }
 
             float multiplier = 1.0f; //almost not noticable

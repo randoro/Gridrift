@@ -73,11 +73,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Server\AntiCheat.cs" />
+    <Compile Include="Server\Packets\AsyncClient.cs" />
+    <Compile Include="Server\Packets\AsyncSocketListener.cs" />
+    <Compile Include="Server\Packets\IAsyncClient.cs" />
+    <Compile Include="Server\Packets\IAsyncSocketListener.cs" />
+    <Compile Include="Server\Packets\IStateObject.cs" />
     <Compile Include="Server\Packets\Packet.cs" />
     <Compile Include="Rendering\Camera.cs" />
     <Compile Include="Server\Chunk.cs" />
     <Compile Include="Server\FileLoader.cs" />
     <Compile Include="Server\Generator.cs" />
+    <Compile Include="Server\Packets\ClientConnection.cs" />
+    <Compile Include="Server\Packets\ServerConnection.cs" />
+    <Compile Include="Server\Packets\StateObject.cs" />
     <Compile Include="Utility\Enums.cs" />
     <Compile Include="Utility\Globals.cs" />
     <Compile Include="Server\InternalPlayer.cs" />

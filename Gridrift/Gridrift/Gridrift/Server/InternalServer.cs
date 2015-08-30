@@ -1,9 +1,12 @@
 ﻿using Gridrift.Rendering;
+using Gridrift.Server.Packets;
 using Gridrift.Utility;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
@@ -21,7 +24,12 @@ namespace Gridrift.Server
         public static int ISchunkCount = 0;
         public static int ISregionCount = 0;
         public bool isRunning;
-        private Object serverLock = new Object();
+        private static Object serverLock = new Object();
+
+        AsyncSocketListener asyncSocketListener;
+        //Thread serverConnectionThread;
+
+        public static ManualResetEvent allDone = new ManualResetEvent(false);
 
         public InternalServer(bool online)
         {
@@ -49,20 +57,24 @@ namespace Gridrift.Server
 
         public void startServer()
         {
-            isRunning = true;
 
+            //serverConnectionThread = new Thread(new ThreadStart(ServerConnection.StartListening));
+            //serverConnectionThread.Start();
+            AsyncSocketListener.Instance.StartListening();
+
+
+            isRunning = true;
             while (isRunning)
             {
-                lock (serverLock)
-                {
-                    syncUpdate();
-                }
-            }
+                syncUpdate();
 
+            }
         }
+
 
         public void syncUpdate()
         {
+            lock (serverLock) { 
             DateTime now = DateTime.Now;
             long nowTicks = now.Ticks;
             if (nowTicks > (lastsyncUpdate + (TimeSpan.TicksPerSecond) / 20))
@@ -84,9 +96,8 @@ namespace Gridrift.Server
                     if (isCheating)
                     {
                         Console.WriteLine("player: offlinePlayer is moving too fast");
-                        
                     }
-                    
+
                 }
 
                 bool stillRemovingChunks = true;
@@ -100,17 +111,19 @@ namespace Gridrift.Server
                 {
                     stillRemovingRegions = unloadUnusedRegions(nowTicks);
                 }
-                
-
-                
 
 
+
+
+            }
 
             }
         }
 
         public void closeServer()
         {
+            AsyncSocketListener.Instance.Dispose();
+
             playerList.Remove("offlinePlayer");
 
             bool stillRemovingChunks = true;
