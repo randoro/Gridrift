@@ -60,7 +60,7 @@ namespace Gridrift.Server
 
             //serverConnectionThread = new Thread(new ThreadStart(ServerConnection.StartListening));
             //serverConnectionThread.Start();
-            AsyncSocketListener.Instance.StartListening();
+            //AsyncSocketListener.Instance.StartListening();
 
 
             isRunning = true;

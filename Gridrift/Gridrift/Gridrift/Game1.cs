@@ -67,12 +67,12 @@ namespace Gridrift
             singlePlayerServer = new Thread(new ThreadStart(internalServer.startServer));
             singlePlayerServer.Start();
 
-            asyncClient = new AsyncClient();
-            asyncClient.StartClient();
+            //asyncClient = new AsyncClient();
+            //asyncClient.StartClient();
 
-            asyncClient.Send("Test", false);
-            asyncClient.Send("Test", false);
-            asyncClient.Send("Test", false);
+            //asyncClient.Send("Test", false);
+            //asyncClient.Send("Test", false);
+            //asyncClient.Send("Test", false);
 
             
             //packetHandlerThread = new Thread(new ThreadStart(packetHandler.start));
@@ -98,7 +98,7 @@ namespace Gridrift
         }
         protected override void UnloadContent()
         {
-            asyncClient.Dispose();
+            //asyncClient.Dispose();
 
             
 

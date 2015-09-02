@@ -42,7 +42,7 @@ namespace Gridrift.Server.Packets
         public void StartListening()
         {
             var host = Dns.GetHostEntry(string.Empty);
-            var ip = host.AddressList[3];
+            var ip = host.AddressList[0];
             var endpoint = new IPEndPoint(ip, Port);
 
             try
