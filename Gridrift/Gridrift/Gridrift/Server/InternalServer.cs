@@ -4,6 +4,7 @@ using Gridrift.Utility;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -26,7 +27,8 @@ namespace Gridrift.Server
         public bool isRunning;
         private static Object serverLock = new Object();
 
-        AsyncSocketListener asyncSocketListener;
+        public List<Thread> clientList;
+        static TcpListener listener;
         //Thread serverConnectionThread;
 
         public static ManualResetEvent allDone = new ManualResetEvent(false);
@@ -39,6 +41,14 @@ namespace Gridrift.Server
             chunkList = new Dictionary<Tuple<int, int>, Chunk>();
             lastsyncUpdate = DateTime.Now.Ticks;
             playerList.Add("offlinePlayer", new InternalPlayer(Player.getPosition(), DateTime.Now.Ticks));
+
+            listener = new TcpListener(2055);
+            listener.Start();
+
+            clientList = new List<Thread>();
+            Thread newThread = new Thread(new ThreadStart(Service));
+            clientList.Add(newThread);
+            newThread.Start();
 
             //Console.WriteLine("0: " + Translation.regionCoordsToFirstChunkCoords(new Point(0, 0)));
             //Console.WriteLine("1: " + Translation.regionCoordsToFirstChunkCoords(new Point(1, 1)));
@@ -53,6 +63,48 @@ namespace Gridrift.Server
             //Console.WriteLine("-33: " + Translation.regionCoordsToFirstChunkCoords(new Point(-33, -33)));
             //Console.WriteLine("-34: " + Translation.regionCoordsToFirstChunkCoords(new Point(-34, -34)));
 
+        }
+
+
+        public static void Service()
+        {
+            while (true)
+            {
+                Socket soc = listener.AcceptSocket();
+                //soc.SetSocketOption(SocketOptionLevel.Socket,
+                //        SocketOptionName.ReceiveTimeout,10000);
+
+                Console.WriteLine("Connected: {0}", 
+                                         soc.RemoteEndPoint);
+
+                try
+                {
+                    Stream s = new NetworkStream(soc);
+                    StreamReader sr = new StreamReader(s);
+                    StreamWriter sw = new StreamWriter(s);
+                    sw.AutoFlush = true; // enable automatic flushing
+                    sw.WriteLine("Employees available");
+                    while (true)
+                    {
+                        string name = sr.ReadLine();
+                        if (name == "" || name == null) break;
+                        if (name == "john")
+                        {
+                            Console.WriteLine("John has connected");
+                        }
+                        string job = "nothing";
+                        if (job == null) job = "No such employee";
+                        sw.WriteLine(job);
+                    }
+                    s.Close();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+                Console.WriteLine("Disconnected something");
+                soc.Close();
+            }
         }
 
         public void startServer()

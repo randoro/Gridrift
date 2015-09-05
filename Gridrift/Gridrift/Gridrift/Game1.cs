@@ -69,7 +69,8 @@ namespace Gridrift
 
             //asyncClient = new AsyncClient();
             //asyncClient.StartClient();
-
+            ClientConnection connection = new ClientConnection();
+            
             //asyncClient.Send("Test", false);
             //asyncClient.Send("Test", false);
             //asyncClient.Send("Test", false);
