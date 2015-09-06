@@ -30,6 +30,7 @@ namespace Gridrift.Server
         public List<Thread> clientList;
         static TcpListener listener;
         //Thread serverConnectionThread;
+        Thread newThread;
 
         public static ManualResetEvent allDone = new ManualResetEvent(false);
 
@@ -42,11 +43,11 @@ namespace Gridrift.Server
             lastsyncUpdate = DateTime.Now.Ticks;
             playerList.Add("offlinePlayer", new InternalPlayer(Player.getPosition(), DateTime.Now.Ticks));
 
-            listener = new TcpListener(2055);
+            listener = new TcpListener(1337);
             listener.Start();
 
             clientList = new List<Thread>();
-            Thread newThread = new Thread(new ThreadStart(Service));
+            newThread = new Thread(new ThreadStart(Service));
             clientList.Add(newThread);
             newThread.Start();
 
@@ -79,22 +80,35 @@ namespace Gridrift.Server
 
                 try
                 {
-                    Stream s = new NetworkStream(soc);
-                    StreamReader sr = new StreamReader(s);
-                    StreamWriter sw = new StreamWriter(s);
-                    sw.AutoFlush = true; // enable automatic flushing
-                    sw.WriteLine("Employees available");
+                    NetworkStream s = new NetworkStream(soc);
+                    //StreamReader sr = new StreamReader(s);
+                    //StreamWriter sw = new StreamWriter(s);
+                    //sw.AutoFlush = true; // enable automatic flushing
+                    //sw.WriteLine("Employees available");
+                    Random rand = new Random();
+                    byte[] byte4 = new byte[4];
                     while (true)
                     {
-                        string name = sr.ReadLine();
-                        if (name == "" || name == null) break;
-                        if (name == "john")
-                        {
-                            Console.WriteLine("John has connected");
-                        }
-                        string job = "nothing";
-                        if (job == null) job = "No such employee";
-                        sw.WriteLine(job);
+                        int length = rand.Next(16);
+                        byte[] data = new byte[length];
+                        for (int i = 0; i < length; i++)
+			            {
+			                data[i] = (byte)rand.Next(255);
+			            }
+
+                        byte4 = BitConverter.GetBytes(length);
+                        s.Write(byte4, 0, 4);
+
+                        s.Write(data, 0, length);
+                        //string name = sr.ReadLine();
+                        //if (name == "" || name == null) break;
+                        //if (name == "john")
+                        //{
+                        //    Console.WriteLine("John has connected");
+                        //}
+                        //string job = "nothing";
+                        //if (job == null) job = "No such employee";
+                        //sw.WriteLine(job);
                     }
                     s.Close();
                 }
@@ -174,7 +188,7 @@ namespace Gridrift.Server
 
         public void closeServer()
         {
-            AsyncSocketListener.Instance.Dispose();
+            //AsyncSocketListener.Instance.Dispose();
 
             playerList.Remove("offlinePlayer");
 
@@ -189,6 +203,10 @@ namespace Gridrift.Server
             {
                 stillRemovingRegions = unloadUnusedRegions(DateTime.Now.Ticks);
             }
+
+            listener.Stop();
+            Thread.Sleep(1000);
+            newThread.Abort();
                 
 
         }

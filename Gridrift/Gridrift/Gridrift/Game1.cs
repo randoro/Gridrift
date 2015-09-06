@@ -22,9 +22,9 @@ namespace Gridrift
         SpriteBatch spriteBatch;
         Dictionary<Tuple<int, int>, Chunk> chunkList;
         InternalServer internalServer;
-        //ClientConnection packetHandler;
+        ClientConnection packetHandler;
         Thread singlePlayerServer;
-        //Thread packetHandlerThread;
+        Thread packetHandlerThread;
         AsyncClient asyncClient;
         Point chunkLoadRange = new Point(5, 3); //set to 5,5 for more lag but no glapping
         Point offset = new Point(2, 1); //set to 2,2 for more lag but no glapping
@@ -62,14 +62,16 @@ namespace Gridrift
             Globals.testBackgroundTexture = Content.Load<Texture2D>("dXdGz");
             Globals.testFont = Content.Load<SpriteFont>("font");
             internalServer = new InternalServer(false);
-            //packetHandler = new ClientConnection("notused", 13000);
+            packetHandler = new ClientConnection("localhost", 1337);
+            packetHandlerThread = new Thread(new ThreadStart(packetHandler.startListening));
+            packetHandlerThread.Start();
             //packetHandler.addPacket(new Packet(PacketID.requestChunk, new byte[3]));
             singlePlayerServer = new Thread(new ThreadStart(internalServer.startServer));
             singlePlayerServer.Start();
 
             //asyncClient = new AsyncClient();
             //asyncClient.StartClient();
-            ClientConnection connection = new ClientConnection();
+
             
             //asyncClient.Send("Test", false);
             //asyncClient.Send("Test", false);
@@ -105,11 +107,12 @@ namespace Gridrift
 
             internalServer.isRunning = false;
             internalServer.closeServer();
-            singlePlayerServer.Abort();
 
-            
+            Thread.Sleep(5000);
             //packetHandler.isRunning = false;
-            //packetHandlerThread.Abort();
+            packetHandlerThread.Abort();
+
+            singlePlayerServer.Abort();
 
 
 

@@ -13,28 +13,50 @@ namespace Gridrift.Server.Packets
 
     class ClientConnection
     {
-        public ClientConnection()
+        TcpClient client;
+
+        public ClientConnection(string hostName, int port)
         {
-            TcpClient client = new TcpClient("localhost", 2055);
+            client = new TcpClient();
+            client.Connect(IPAddress.Parse("77.105.222.65"), port); //will pause here if no conn found
+        }
+
+        public void startListening()
+        {
+            
             try
             {
-                Stream s = client.GetStream();
-                StreamReader sr = new StreamReader(s);
-                StreamWriter sw = new StreamWriter(s);
-                sw.AutoFlush = true;
-                Console.WriteLine(sr.ReadLine());
+                NetworkStream s = client.GetStream();
+                //StreamReader sr = new StreamReader(s);
+                //StreamWriter sw = new StreamWriter(s);
+                //sw.AutoFlush = true;
+                byte[] byte4 = new byte[4];
+                
+                //Console.WriteLine("CS: "+sr.ReadLine());
                 while (true)
                 {
-                    Console.Write("Name: ");
-                    string name = "john";
-                    sw.WriteLine(name);
-                    if (name == "") break;
-                    Console.WriteLine(sr.ReadLine());
+                    s.Read(byte4, 0, 4);
+                    int bytesInt = BitConverter.ToInt32(byte4, 0);
+                    Console.WriteLine("CS: size:" + bytesInt);
+                    byte[] result = new byte[bytesInt];
+                    s.Read(result, 0, bytesInt);
+                    Console.Write("CS: result: ");
+                    for (int i = 0; i < bytesInt; i++)
+			        {
+                        Console.Write(result[i] + ", ");
+			        }
+                    Console.WriteLine(" ");
+                    //Console.Write("CS: " + "Name: ");
+                    //string name = "john";
+                    //sw.WriteLine(name);
+                    //if (name == "") break;
+                    //Console.WriteLine("CS: " + sr.ReadLine());
                 }
                 s.Close();
             }
             finally
             {
+                
                 // code in finally block is guranteed 
                 // to execute irrespective of 
                 // whether any exception occurs or does 
@@ -42,8 +64,6 @@ namespace Gridrift.Server.Packets
                 client.Close();
             }
         }
-
-
 
 
         //private Queue<Packet> sendQueue;
