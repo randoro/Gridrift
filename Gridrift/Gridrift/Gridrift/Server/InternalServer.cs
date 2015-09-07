@@ -85,21 +85,21 @@ namespace Gridrift.Server
                     //StreamWriter sw = new StreamWriter(s);
                     //sw.AutoFlush = true; // enable automatic flushing
                     //sw.WriteLine("Employees available");
-                    Random rand = new Random();
+                    Packet newPacket = new Packet(PacketID.requestChunk, 45, new byte[45]);
                     byte[] byte4 = new byte[4];
                     while (true)
                     {
-                        int length = rand.Next(16);
-                        byte[] data = new byte[length];
-                        for (int i = 0; i < length; i++)
-			            {
-			                data[i] = (byte)rand.Next(255);
-			            }
+                        //int length = rand.Next(14160);
+                        //byte[] data = new byte[length];
+                        //for (int i = 0; i < length; i++)
+			            //{
+			            //    data[i] = (byte)rand.Next(2);
+			            //}
 
-                        byte4 = BitConverter.GetBytes(length);
-                        s.Write(byte4, 0, 4);
 
-                        s.Write(data, 0, length);
+                        s.Write(newPacket.getPacketArray(), 0, newPacket.getPacketArray().Length);
+
+                        //s.Write(data, 0, length);
                         //string name = sr.ReadLine();
                         //if (name == "" || name == null) break;
                         //if (name == "john")

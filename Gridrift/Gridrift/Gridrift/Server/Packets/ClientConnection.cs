@@ -31,10 +31,13 @@ namespace Gridrift.Server.Packets
                 //StreamWriter sw = new StreamWriter(s);
                 //sw.AutoFlush = true;
                 byte[] byte4 = new byte[4];
+                byte byte1;
+                Packet incomingPacket;
                 
                 //Console.WriteLine("CS: "+sr.ReadLine());
                 while (true)
                 {
+                    byte1 = (byte)s.ReadByte();
                     s.Read(byte4, 0, 4);
                     int bytesInt = BitConverter.ToInt32(byte4, 0);
                     Console.WriteLine("CS: size:" + bytesInt);
@@ -43,9 +46,11 @@ namespace Gridrift.Server.Packets
                     Console.Write("CS: result: ");
                     for (int i = 0; i < bytesInt; i++)
 			        {
-                        Console.Write(result[i] + ", ");
+                        Console.Write(result[i]);
 			        }
                     Console.WriteLine(" ");
+
+                    incomingPacket = new Packet((PacketID)byte1, bytesInt, result);
                     //Console.Write("CS: " + "Name: ");
                     //string name = "john";
                     //sw.WriteLine(name);
