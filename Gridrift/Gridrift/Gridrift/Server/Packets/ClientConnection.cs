@@ -51,6 +51,9 @@ namespace Gridrift.Server.Packets
                     Console.WriteLine(" ");
 
                     incomingPacket = new Packet((PacketID)byte1, bytesInt, result);
+                    
+
+
                     //Console.Write("CS: " + "Name: ");
                     //string name = "john";
                     //sw.WriteLine(name);
