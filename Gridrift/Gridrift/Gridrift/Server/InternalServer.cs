@@ -24,13 +24,14 @@ namespace Gridrift.Server
         private const int secondsTimeToLiveForRegions = 5;
         public static int ISchunkCount = 0;
         public static int ISregionCount = 0;
-        public bool isRunning;
+        public bool isRunning { get; private set; }
+        public static bool isListening { get; private set; }
         private static Object serverLock = new Object();
 
-        public List<Thread> clientList;
+        public static List<Thread> clientList;
         static TcpListener listener;
         //Thread serverConnectionThread;
-        Thread newThread;
+        Thread listningThread;
 
         public static ManualResetEvent allDone = new ManualResetEvent(false);
 
@@ -42,14 +43,15 @@ namespace Gridrift.Server
             chunkList = new Dictionary<Tuple<int, int>, Chunk>();
             lastsyncUpdate = DateTime.Now.Ticks;
             playerList.Add("offlinePlayer", new InternalPlayer(Player.getPosition(), DateTime.Now.Ticks));
+            clientList = new List<Thread>();
 
-            listener = new TcpListener(1337);
+
+            isListening = true;
+            listener = new TcpListener(IPAddress.Any, 1337);
             listener.Start();
 
-            clientList = new List<Thread>();
-            newThread = new Thread(new ThreadStart(Service));
-            clientList.Add(newThread);
-            newThread.Start();
+            listningThread = new Thread(new ThreadStart(Listen));
+            listningThread.Start();
 
             //Console.WriteLine("0: " + Translation.regionCoordsToFirstChunkCoords(new Point(0, 0)));
             //Console.WriteLine("1: " + Translation.regionCoordsToFirstChunkCoords(new Point(1, 1)));
@@ -66,17 +68,25 @@ namespace Gridrift.Server
 
         }
 
-
-        public static void Service()
+        public static void Listen()
         {
-            while (true)
+            while (isListening)
             {
-                Socket soc = listener.AcceptSocket();
-                //soc.SetSocketOption(SocketOptionLevel.Socket,
-                //        SocketOptionName.ReceiveTimeout,10000);
+                TcpClient newclient = listener.AcceptTcpClient();
+                Thread newThread = new Thread(new ParameterizedThreadStart(Service));
+                clientList.Add(newThread);
+                newThread.Start(newclient);
+                
+            }
+        }
 
-                Console.WriteLine("Connected: {0}", 
-                                         soc.RemoteEndPoint);
+
+        public static void Service(object clientObj)
+        {
+            TcpClient client = (TcpClient)clientObj;
+            
+                Console.WriteLine("Connected: {0}", client.Client.RemoteEndPoint);
+                Socket soc = client.Client;
 
                 try
                 {
@@ -85,10 +95,26 @@ namespace Gridrift.Server
                     //StreamWriter sw = new StreamWriter(s);
                     //sw.AutoFlush = true; // enable automatic flushing
                     //sw.WriteLine("Employees available");
-                    Packet newPacket = new Packet(PacketID.requestChunk, 45, new byte[45]);
+                    Packet incomingPacket;
                     byte[] byte4 = new byte[4];
-                    while (true)
+                    while (isListening)
                     {
+                        incomingPacket = Packet.recievePacket(s);
+                        Console.Write("SS: recieved new Packet:");
+                        Console.Write(" PacketID =" + incomingPacket.packetID.ToString());
+                        Console.Write(" PacketDataLength =" + incomingPacket.byteDataLength);
+                        Console.Write(" PacketData =");
+                        for (int i = 0; i < incomingPacket.byteDataLength; i++)
+                        {
+                            Console.Write(incomingPacket.byteData[i]);
+                        }
+                        Console.WriteLine(" ");
+
+                        if (incomingPacket.packetID.Equals(PacketID.connect))
+                        {
+                            Packet newPacket = new Packet(PacketID.sendChunk, 5, new byte[5] { 1, 2, 3, 4, 5 });
+                            Packet.sendPacket(newPacket, s);
+                        }
                         //int length = rand.Next(14160);
                         //byte[] data = new byte[length];
                         //for (int i = 0; i < length; i++)
@@ -97,7 +123,7 @@ namespace Gridrift.Server
 			            //}
 
 
-                        s.Write(newPacket.getPacketArray(), 0, newPacket.getPacketArray().Length);
+                        
 
                         //s.Write(data, 0, length);
                         //string name = sr.ReadLine();
@@ -116,9 +142,12 @@ namespace Gridrift.Server
                 {
                     Console.WriteLine(e.Message);
                 }
+                finally
+                {
+                    soc.Close();
+                }
                 Console.WriteLine("Disconnected something");
                 soc.Close();
-            }
         }
 
         public void startServer()
@@ -189,6 +218,7 @@ namespace Gridrift.Server
         public void closeServer()
         {
             //AsyncSocketListener.Instance.Dispose();
+            isRunning = false;
 
             playerList.Remove("offlinePlayer");
 
@@ -205,8 +235,13 @@ namespace Gridrift.Server
             }
 
             listener.Stop();
-            Thread.Sleep(1000);
-            newThread.Abort();
+
+            listningThread.Abort();
+
+            foreach (Thread t in clientList)
+            {
+                t.Abort();
+            }
                 
 
         }

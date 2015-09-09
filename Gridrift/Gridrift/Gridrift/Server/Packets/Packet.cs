@@ -1,6 +1,7 @@
 ﻿using Gridrift.Utility;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -9,10 +10,11 @@ namespace Gridrift.Server.Packets
 
     class Packet
     {
-        protected PacketID packetID;
-        protected int byteDataLength;
-        protected byte[] byteData;
+        public PacketID packetID { get; set; }
+        public int byteDataLength { get; set; }
+        public byte[] byteData { get; set; }
 
+        #region constructors
         public Packet(PacketID packetID, int byteDataLength, byte[] byteData)
         {
             this.packetID = packetID;
@@ -25,24 +27,21 @@ namespace Gridrift.Server.Packets
             setPacketArray(realArray);
         }
 
-        public PacketID getID()
+        public Packet()
         {
-            return packetID;
+
+        }
+        #endregion
+
+
+        private byte getIDbytes()
+        {
+            return (byte)packetID;
         }
 
-        public byte[] getData()
+        private byte[] getDataLengthBytes()
         {
-            return byteData;
-        }
-
-        public void setID(PacketID newID)
-        {
-            packetID = newID;
-        }
-
-        public void setData(byte[] newData)
-        {
-            byteData = newData;
+            return BitConverter.GetBytes(byteDataLength);
         }
 
         public byte[] getPacketArray()
@@ -66,6 +65,36 @@ namespace Gridrift.Server.Packets
             Array.Copy(realArray, 5, byteData, 0, byteDataLength);
         }
 
+        public static void sendPacket(Packet packet, Stream stream)
+        {
+            stream.WriteByte(packet.getIDbytes());
+            stream.Write(packet.getDataLengthBytes(), 0, sizeof(int));
+            if (packet.byteDataLength > 0)
+            {
+            stream.Write(packet.byteData, 0, packet.byteDataLength);
+            }
+        }
+
+        public static Packet recievePacket(Stream stream)
+        {
+            
+            PacketID packetID = (PacketID)stream.ReadByte(); //check for -1 later
+            byte[] byte4 = new byte[4];
+            stream.Read(byte4, 0, sizeof(int));
+            int byteDataLength = BitConverter.ToInt32(byte4, 0);
+            if (byteDataLength > 0)
+            {
+                byte[] byteData = new byte[byteDataLength];
+                stream.Read(byteData, 0, byteDataLength);
+
+                return new Packet(packetID, byteDataLength, byteData);
+            }
+            else
+            {
+                return new Packet(packetID, byteDataLength, null);
+            }
+            
+        }
 
     }
 }
