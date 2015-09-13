@@ -57,7 +57,24 @@ namespace Gridrift.Server
                 else
                 {
                     //generate new Chunk
-                    return Generator.generateChunk(chunkID);
+                    Chunk newChunk = Generator.generateChunk(chunkID);
+                    byte[] chunkData = TagTranslator.saveChunk(newChunk);
+                    int chunkSizeInBytesInt = chunkData.Length;
+                    if (chunkSizeInBytesInt < 4096)
+                    {
+                        //update regionScheme
+                        int chunkPositionInFileInt = (1024 + (4096 * 2)) + (chunkIDInArrays * 4096);
+                        chunkPositionInFile[chunkIDInArrays] = chunkPositionInFileInt;
+                        chunkSizeInBytes[chunkIDInArrays] = chunkSizeInBytesInt;
+                        chunkIsPresent[chunkIDInArrays] = 1;
+                        //write to filestream
+                        pushByteArray(chunkData, chunkPositionInFileInt, chunkSizeInBytesInt);
+                        return newChunk;
+                    }
+                    else
+                    {
+                        throw new System.Exception("Chunk size too big. (Equal to or above 1024 bytes)");
+                    }
                 }
             }
             else
@@ -119,10 +136,10 @@ namespace Gridrift.Server
             chunkIsPresent = fetchByteArray(0, 1024);
 
             //fetch chunkPositionInFile ints
-            chunkPositionInFile = fetchInt32Array(sizeof(byte)*1024, sizeof(int)*1024);
+            chunkPositionInFile = fetchInt32Array(sizeof(byte)*1024, 1024);
 
             //fetch chunkSizeInBytes ints
-            chunkSizeInBytes = fetchInt32Array(sizeof(byte) * 1024 + sizeof(int) * 1024, sizeof(int) * 1024);
+            chunkSizeInBytes = fetchInt32Array(sizeof(byte) * 1024 + sizeof(int) * 1024, 1024);
         }
 
         private void saveRegionScheme()
@@ -161,11 +178,11 @@ namespace Gridrift.Server
         private int[] fetchInt32Array(int position, int length)
         {
             fileStream.Position = position;
-            byte[] bytebuffer = new byte[length];
-            fileStream.Read(bytebuffer, 0, length);
+            byte[] bytebuffer = new byte[length * sizeof(int)];
+            fileStream.Read(bytebuffer, 0, length * sizeof(int));
 
-            int[] returnBuffer = new int[length / sizeof(int)];
-            for (int i = 0; i < (length / sizeof(int)); i++)
+            int[] returnBuffer = new int[length];
+            for (int i = 0; i < length; i++)
             {
                 returnBuffer[i] = BitConverter.ToInt32(bytebuffer, i*sizeof(int));
             }

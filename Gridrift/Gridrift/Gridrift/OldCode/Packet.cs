@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Gridrift.Server.Packets
+namespace Gridrift.OldCode
 {
 
     class Packet

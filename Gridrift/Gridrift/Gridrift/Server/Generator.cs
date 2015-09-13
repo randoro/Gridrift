@@ -39,7 +39,7 @@ namespace Gridrift.Server
             byte[] blocks = new byte[256];
             for (int i = 0; i < 256; i++)
             {
-                blocks[i] = (byte)i;
+                blocks[i] = (byte)0;
             }
             chunk.blocks = blocks;
 

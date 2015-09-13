@@ -1,5 +1,4 @@
 ﻿using Gridrift.Rendering;
-using Gridrift.Server.Packets;
 using Gridrift.Utility;
 using Microsoft.Xna.Framework;
 using System;
@@ -18,22 +17,17 @@ namespace Gridrift.Server
         public bool isOnline;
         public static World testWorld = new World("world");
         Dictionary<Tuple<int,int>, Region> regionList;
-        Dictionary<Tuple<int, int>, Chunk> chunkList;
+        public Dictionary<Tuple<int, int>, Chunk> chunkList;
         Dictionary<String, InternalPlayer> playerList;
         long lastsyncUpdate;
         private const int secondsTimeToLiveForRegions = 5;
         public static int ISchunkCount = 0;
         public static int ISregionCount = 0;
         public bool isRunning { get; private set; }
-        public static bool isListening { get; private set; }
+        //public static bool isListening { get; private set; }
         private static Object serverLock = new Object();
 
-        public static List<Thread> clientList;
-        static TcpListener listener;
-        //Thread serverConnectionThread;
-        Thread listningThread;
-
-        public static ManualResetEvent allDone = new ManualResetEvent(false);
+        
 
         public InternalServer(bool online)
         {
@@ -43,15 +37,8 @@ namespace Gridrift.Server
             chunkList = new Dictionary<Tuple<int, int>, Chunk>();
             lastsyncUpdate = DateTime.Now.Ticks;
             playerList.Add("offlinePlayer", new InternalPlayer(Player.getPosition(), DateTime.Now.Ticks));
-            clientList = new List<Thread>();
+            
 
-
-            isListening = true;
-            listener = new TcpListener(IPAddress.Any, 1337);
-            listener.Start();
-
-            listningThread = new Thread(new ThreadStart(Listen));
-            listningThread.Start();
 
             //Console.WriteLine("0: " + Translation.regionCoordsToFirstChunkCoords(new Point(0, 0)));
             //Console.WriteLine("1: " + Translation.regionCoordsToFirstChunkCoords(new Point(1, 1)));
@@ -68,116 +55,14 @@ namespace Gridrift.Server
 
         }
 
-        public static void Listen()
-        {
-            while (isListening)
-            {
-                TcpClient newclient = listener.AcceptTcpClient();
-                Thread newThread = new Thread(new ParameterizedThreadStart(Service));
-                clientList.Add(newThread);
-                newThread.Start(newclient);
-                
-            }
-        }
-
-
-        public static void Service(object clientObj)
-        {
-            TcpClient client = (TcpClient)clientObj;
-            
-                Console.WriteLine("Connected: {0}", client.Client.RemoteEndPoint);
-                Socket soc = client.Client;
-
-                try
-                {
-                    NetworkStream s = new NetworkStream(soc);
-                    //StreamReader sr = new StreamReader(s);
-                    //StreamWriter sw = new StreamWriter(s);
-                    //sw.AutoFlush = true; // enable automatic flushing
-                    //sw.WriteLine("Employees available");
-                    Packet incomingPacket;
-                    byte[] byte4 = new byte[4];
-                    while (isListening)
-                    {
-                        incomingPacket = Packet.recievePacket(s);
-                        Console.Write("SS: recieved new Packet:");
-                        Console.Write(" PacketID =" + incomingPacket.packetID.ToString());
-                        Console.Write(" PacketDataLength =" + incomingPacket.byteDataLength);
-                        Console.Write(" PacketData =");
-                        for (int i = 0; i < incomingPacket.byteDataLength; i++)
-                        {
-                            Console.Write(incomingPacket.byteData[i]);
-                        }
-                        Console.WriteLine(" ");
-
-                        if (incomingPacket.packetID.Equals(PacketID.connect))
-                        {
-                            Packet newPacket = new Packet(PacketID.sendChunk, 5, new byte[5] { 1, 2, 3, 4, 5 });
-                            Packet.sendPacket(newPacket, s);
-                        }
-                        //int length = rand.Next(14160);
-                        //byte[] data = new byte[length];
-                        //for (int i = 0; i < length; i++)
-			            //{
-			            //    data[i] = (byte)rand.Next(2);
-			            //}
-
-
-                        
-
-                        //s.Write(data, 0, length);
-                        //string name = sr.ReadLine();
-                        //if (name == "" || name == null) break;
-                        //if (name == "john")
-                        //{
-                        //    Console.WriteLine("John has connected");
-                        //}
-                        //string job = "nothing";
-                        //if (job == null) job = "No such employee";
-                        //sw.WriteLine(job);
-                    }
-                    s.Close();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                }
-                finally
-                {
-                    soc.Close();
-                }
-                Console.WriteLine("Disconnected something");
-                soc.Close();
-        }
-
-        public void startServer()
-        {
-
-            //serverConnectionThread = new Thread(new ThreadStart(ServerConnection.StartListening));
-            //serverConnectionThread.Start();
-            //AsyncSocketListener.Instance.StartListening();
-
-
-            isRunning = true;
-            while (isRunning)
-            {
-                syncUpdate();
-
-            }
-        }
-
 
         public void syncUpdate()
         {
-            lock (serverLock) { 
             DateTime now = DateTime.Now;
             long nowTicks = now.Ticks;
             if (nowTicks > (lastsyncUpdate + (TimeSpan.TicksPerSecond) / 20))
             {
                 lastsyncUpdate = lastsyncUpdate + (TimeSpan.TicksPerSecond / 20);
-                //Console.WriteLine(" ");
-                //Console.WriteLine("Chunks in IS chunkList: " + chunkList.Count);
-                //Console.WriteLine("Regions in IS regionList: " + regionList.Count);
                 //Make changes - this happens 20 times per second ideally
 
                 ISchunkCount = chunkList.Count;
@@ -187,11 +72,12 @@ namespace Gridrift.Server
                 playerList.TryGetValue("offlinePlayer", out player);
                 if (player != null)
                 {
-                    bool isCheating = AntiCheat.checkAndChangePlayerPosition(player, Player.getPosition(), DateTime.Now.Ticks);
-                    if (isCheating)
-                    {
-                        Console.WriteLine("player: offlinePlayer is moving too fast");
-                    }
+                    player.setPosition(Player.getPosition());
+                    //bool isCheating = AntiCheat.checkAndChangePlayerPosition(player, Player.getPosition(), DateTime.Now.Ticks);
+                    //if (isCheating)
+                    //{
+                    //    Console.WriteLine("player: offlinePlayer is moving too fast");
+                    //}
 
                 }
 
@@ -209,8 +95,6 @@ namespace Gridrift.Server
 
 
 
-
-            }
 
             }
         }
@@ -231,27 +115,15 @@ namespace Gridrift.Server
             bool stillRemovingRegions = true;
             while (stillRemovingRegions)
             {
-                stillRemovingRegions = unloadUnusedRegions(DateTime.Now.Ticks);
+                stillRemovingRegions = unloadUnusedRegions(DateTime.Now.Ticks + (TimeSpan.TicksPerSecond * (secondsTimeToLiveForRegions + 1)));
             }
-
-            listener.Stop();
-
-            listningThread.Abort();
-
-            foreach (Thread t in clientList)
-            {
-                t.Abort();
-            }
-                
 
         }
 
-        
+
 
         public Chunk getChunk(World world, Point chunkCordinates)
         {
-            lock (serverLock)
-            {
                 Chunk alreadyLoadedChunk;
                 Tuple<int, int> chunkCordinatesTuple = Tuple.Create(chunkCordinates.X, chunkCordinates.Y);
                 if (chunkList.TryGetValue(chunkCordinatesTuple, out alreadyLoadedChunk))
@@ -270,6 +142,7 @@ namespace Gridrift.Server
                     if (newChunk.terrainPopulated == 1)
                     {
                         chunkList.Add(chunkCordinatesTuple, newChunk);
+                        
                         return newChunk;
                     }
                     else
@@ -305,7 +178,6 @@ namespace Gridrift.Server
                     }
                 }
                 return null;
-            }
         }
 
 
@@ -375,10 +247,10 @@ namespace Gridrift.Server
                         else
                         {
                             currentRegion.writeChunk(chunkPair.Value);
+                            removedChunk = true;
+                            chunkList.Remove(chunkPair.Key);
                         }
                     }
-                    removedChunk = true;
-                    chunkList.Remove(chunkPair.Key);
                     break;
                 }
             }
@@ -423,6 +295,35 @@ namespace Gridrift.Server
                 }
             }
             return removedRegion;
+        }
+
+        public void unloadChunk(Tuple<int, int> chunkToRemoveID)
+        {
+            Chunk chunkToRemove;
+
+            chunkList.TryGetValue(chunkToRemoveID, out chunkToRemove);
+
+            if (chunkToRemove != null)
+            {
+                Point chunkCoords = new Point(chunkToRemoveID.Item1, chunkToRemoveID.Item2);
+
+                Point regionID = Translation.chunkCoordsToRegionCoords(chunkCoords);
+                Region currentRegion;
+
+                regionList.TryGetValue(Tuple.Create(regionID.X, regionID.Y), out currentRegion);
+                if (currentRegion != null)
+                {
+                    if (chunkToRemove.terrainPopulated == 0)
+                    {
+                        int test = 1; //throw exception
+                    }
+                    else
+                    {
+                        currentRegion.writeChunk(chunkToRemove);
+                        chunkList.Remove(chunkToRemoveID);
+                    }
+                }
+            }
         }
     }
 }

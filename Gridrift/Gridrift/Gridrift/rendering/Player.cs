@@ -18,6 +18,9 @@ namespace Gridrift.Rendering
 
         private static int animationCounter = 0;
         private static int walkingFrame = 0;
+        private static int drawOffsetX = 16;
+        private static int drawOffsetY = 32;
+
 
         public static Point getPosition()
         {
@@ -34,7 +37,7 @@ namespace Gridrift.Rendering
         /// </summary>
         public static void changeVelocity(Vector2 addedVelocity)
         {
-            int maxSpeed = 30;
+            int maxSpeed = 3;
             velocity += addedVelocity;
             if (velocity.X > 0)
             {
@@ -186,39 +189,39 @@ namespace Gridrift.Rendering
             switch (direction)
             {
                 case Direction.None:
-                    spriteBatch.Draw(Globals.testPlayerTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(0, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f);    
+                    spriteBatch.Draw(Globals.testPlayerTexture, new Vector2(Player.getPosition().X - drawOffsetX, Player.getPosition().Y - drawOffsetY), new Rectangle(0, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f);    
             
                     break;
                 case Direction.North:
-                    spriteBatch.Draw(Globals.testPlayerTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(64, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f);    
+                    spriteBatch.Draw(Globals.testPlayerTexture, new Vector2(Player.getPosition().X - drawOffsetX, Player.getPosition().Y - drawOffsetY), new Rectangle(64, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f);    
             
                     break;
                 case Direction.NorthEast:
-                    spriteBatch.Draw(Globals.testPlayerTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(224, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f);    
+                    spriteBatch.Draw(Globals.testPlayerTexture, new Vector2(Player.getPosition().X - drawOffsetX, Player.getPosition().Y - drawOffsetY), new Rectangle(224, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f);    
             
                     break;
                 case Direction.East:
-                    spriteBatch.Draw(Globals.testPlayerTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(96, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f);    
+                    spriteBatch.Draw(Globals.testPlayerTexture, new Vector2(Player.getPosition().X - drawOffsetX, Player.getPosition().Y - drawOffsetY), new Rectangle(96, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f);    
             
                     break;
                 case Direction.SouthEast:
-                    spriteBatch.Draw(Globals.testPlayerTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(128, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f);    
+                    spriteBatch.Draw(Globals.testPlayerTexture, new Vector2(Player.getPosition().X - drawOffsetX, Player.getPosition().Y - drawOffsetY), new Rectangle(128, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f);    
             
                     break;
                 case Direction.South:
-                    spriteBatch.Draw(Globals.testPlayerTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(0, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f);    
+                    spriteBatch.Draw(Globals.testPlayerTexture, new Vector2(Player.getPosition().X - drawOffsetX, Player.getPosition().Y - drawOffsetY), new Rectangle(0, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f);    
             
                     break;
                 case Direction.SouthWest:
-                    spriteBatch.Draw(Globals.testPlayerTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(160, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f);    
+                    spriteBatch.Draw(Globals.testPlayerTexture, new Vector2(Player.getPosition().X - drawOffsetX, Player.getPosition().Y - drawOffsetY), new Rectangle(160, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f);    
             
                     break;
                 case Direction.West:
-                    spriteBatch.Draw(Globals.testPlayerTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(32, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f);    
+                    spriteBatch.Draw(Globals.testPlayerTexture, new Vector2(Player.getPosition().X - drawOffsetX, Player.getPosition().Y - drawOffsetY), new Rectangle(32, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f);    
             
                     break;
                 case Direction.NorthWest:
-                    spriteBatch.Draw(Globals.testPlayerTexture, new Vector2(Player.getPosition().X, Player.getPosition().Y), new Rectangle(192, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f);    
+                    spriteBatch.Draw(Globals.testPlayerTexture, new Vector2(Player.getPosition().X - drawOffsetX, Player.getPosition().Y - drawOffsetY), new Rectangle(192, walkingFrame * 32, 32, 32), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9f);    
             
                     break;
                 default:

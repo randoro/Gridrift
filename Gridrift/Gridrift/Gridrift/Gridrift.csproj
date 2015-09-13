@@ -85,19 +85,23 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GUI\Button.cs" />
+    <Compile Include="GUI\Menu.cs" />
+    <Compile Include="GUI\MenuObject.cs" />
+    <Compile Include="GUI\StringButton.cs" />
     <Compile Include="Server\AntiCheat.cs" />
     <Compile Include="OldCode\AsyncClient.cs" />
     <Compile Include="OldCode\AsyncSocketListener.cs" />
     <Compile Include="OldCode\IAsyncClient.cs" />
     <Compile Include="OldCode\IAsyncSocketListener.cs" />
     <Compile Include="OldCode\IStateObject.cs" />
-    <Compile Include="Server\Packets\Packet.cs" />
+    <Compile Include="OldCode\Packet.cs" />
     <Compile Include="Rendering\Camera.cs" />
     <Compile Include="Server\Chunk.cs" />
     <Compile Include="Server\FileLoader.cs" />
     <Compile Include="Server\Generator.cs" />
-    <Compile Include="Server\Packets\ClientConnection.cs" />
-    <Compile Include="Server\Packets\ServerConnection.cs" />
+    <Compile Include="OldCode\ClientConnection.cs" />
+    <Compile Include="OldCode\ServerConnection.cs" />
     <Compile Include="OldCode\StateObject.cs" />
     <Compile Include="Utility\Enums.cs" />
     <Compile Include="Utility\Globals.cs" />
@@ -152,6 +156,7 @@
   <ItemGroup>
     <None Include="Gridrift_TemporaryKey.pfx" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--

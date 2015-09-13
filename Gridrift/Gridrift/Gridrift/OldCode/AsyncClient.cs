@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace Gridrift.Server.Packets
+namespace Gridrift.OldCode
 {
     public delegate void ConnectedHandler(IAsyncClient a);
     public delegate void ClientMessageReceivedHandler(IAsyncClient a, string msg);

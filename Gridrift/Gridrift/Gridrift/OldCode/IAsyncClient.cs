@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Gridrift.Server.Packets
+namespace Gridrift.OldCode
 {
     public interface IAsyncClient : IDisposable
     {

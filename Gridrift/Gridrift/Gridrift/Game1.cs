@@ -12,7 +12,6 @@ using Gridrift.Server;
 using Gridrift.Utility;
 using Gridrift.Rendering;
 using System.Threading;
-using Gridrift.Server.Packets;
 
 namespace Gridrift
 {
@@ -20,13 +19,11 @@ namespace Gridrift
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Dictionary<Tuple<int, int>, Chunk> chunkList;
+        //Dictionary<Tuple<int, int>, Chunk> chunkList;
         InternalServer internalServer;
-        ClientConnection clientConnection;
         Thread singlePlayerServerThread;
-        Thread clientConnectionThread;
-        Point chunkLoadRange = new Point(5, 3); //set to 5,5 for more lag but no glapping
-        Point offset = new Point(2, 1); //set to 2,2 for more lag but no glapping
+        Point chunkLoadRange = new Point(5, 3); //set to 7,5 for more lag but no glapping. lowest: 5,3 high: 7,5
+        Point offset = new Point(2, 1); //set to 3,2 for more lag but no glapping. lowest: 2,1 high: 3,2
         long lastsyncUpdate;
         GameState gameState;
 
@@ -39,7 +36,6 @@ namespace Gridrift
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            chunkList = new Dictionary<Tuple<int, int>, Chunk>();
             
             
         }
@@ -61,12 +57,10 @@ namespace Gridrift
             Globals.testPlayerTexture = Content.Load<Texture2D>("playerSheet");
             Globals.testBackgroundTexture = Content.Load<Texture2D>("dXdGz");
             Globals.testFont = Content.Load<SpriteFont>("font");
+
+            //chunkList = new Dictionary<Tuple<int, int>, Chunk>();
+
             internalServer = new InternalServer(false);
-            clientConnection = new ClientConnection("localhost", 1337);
-            clientConnectionThread = new Thread(new ThreadStart(clientConnection.startListening));
-            clientConnectionThread.Start();
-            singlePlayerServerThread = new Thread(new ThreadStart(internalServer.startServer));
-            singlePlayerServerThread.Start();
 
             
             lastsyncUpdate = DateTime.Now.Ticks;
@@ -94,13 +88,10 @@ namespace Gridrift
 
             
             internalServer.closeServer();
-            clientConnection.stopListening();
+            //clientConnection.stopListening();
 
-            while (clientConnection.listening) { }
-            clientConnectionThread.Abort();
-
-            while (internalServer.isRunning) { }
-            singlePlayerServerThread.Abort();
+            //while (internalServer.isRunning) { }
+            //singlePlayerServerThread.Abort();
 
 
 
@@ -111,7 +102,7 @@ namespace Gridrift
         {
             syncUpdate();
 
-
+            
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
                 //graphics.IsFullScreen = false;
@@ -149,7 +140,9 @@ namespace Gridrift
                 Player.changeVelocity(new Vector2(0, 0.7f * multiplier));
             }
 
+            
             Player.update(gameTime);
+            internalServer.syncUpdate();
 
             Globals.currentWindowHeight = this.Window.ClientBounds.Height;
             Globals.currentWindowWidth = this.Window.ClientBounds.Width;
@@ -177,31 +170,41 @@ namespace Gridrift
                 {
                     for (int j = 0; j < chunkLoadRange.X; j++)
                     {
-                        if (!chunkList.ContainsKey(Tuple.Create(currentChunkCoords.X + j - offset.X, currentChunkCoords.Y + i - offset.Y)))
-                        {
+                        //if (!internalServer.chunkList.ContainsKey(Tuple.Create(currentChunkCoords.X + j - offset.X, currentChunkCoords.Y + i - offset.Y)))
+                        //{
                             Point newChunkCoords = new Point(currentChunkCoords.X + j - offset.X, currentChunkCoords.Y + i - offset.Y);
                             Chunk newChunk = internalServer.getChunk(new World("world"), newChunkCoords);
-                            if (newChunk != null)
-                            {
-                                if (newChunk.terrainPopulated == 1)
-                                {
-                                    chunkList.Add(Tuple.Create(currentChunkCoords.X + j - offset.X, currentChunkCoords.Y + i - offset.Y), newChunk);
-                                }
-                            }
-                        }
+                            //if (newChunk != null)
+                           // {
+                               // if (newChunk.terrainPopulated == 1)
+                               // {
+                                    //internalServer.chunkList.Add(Tuple.Create(currentChunkCoords.X + j - offset.X, currentChunkCoords.Y + i - offset.Y), newChunk);
+                               // }
+                           // }
+                       // }
                     }
                 }
-                foreach (KeyValuePair<Tuple<int, int>, Chunk> chunkPair in chunkList)
-                {
-                    Point currentChunkID = new Point(chunkPair.Key.Item1, chunkPair.Key.Item2);
-                    bool withinReach = Translation.withinReach(currentChunkCoords, currentChunkID, offset.X);
-                    if (!withinReach)
-                    {
-                        //Console.WriteLine("Chunks in C chunkList: " + chunkList.Count);
-                        chunkList.Remove(chunkPair.Key);
-                        break;
-                    }
-                }
+                //foreach (KeyValuePair<Tuple<int, int>, Chunk> chunkPair in internalServer.chunkList)
+                //{
+                //    Point currentChunkID = new Point(chunkPair.Key.Item1, chunkPair.Key.Item2);
+                //    bool withinReach = Translation.withinReach(currentChunkCoords, currentChunkID, offset.X);
+                //    if (!withinReach)
+                //    {
+                //        //Console.WriteLine("Chunks in C chunkList: " + chunkList.Count);
+                //        internalServer.unloadChunk(chunkPair.Key);
+                //        break;
+                //    }
+                //}
+
+
+                Point currentPlayerPos = Translation.exactPosToChunkCoords(Player.getPosition());
+
+                Chunk newChunk2;
+                internalServer.chunkList.TryGetValue(Tuple.Create(currentChunkCoords.X, currentChunkCoords.Y), out newChunk2);
+
+                Point currentPlayerBlock = Translation.exactPosToBlockCoords(Player.getPosition());
+                Point internalChunkBlock = Translation.blockCoordsToInternalChunkBlockCoords(currentPlayerBlock);
+                newChunk2.blocks[internalChunkBlock.X + internalChunkBlock.Y * 16] = 1;
             }
         }
 
@@ -219,9 +222,9 @@ namespace Gridrift
             {
                 for (int j = 0; j < chunkLoadRange.X; j++)
                 {
-                    if (chunkList.ContainsKey(Tuple.Create(p.X + j - offset.X, p.Y + i - offset.Y)))
+                    if (internalServer.chunkList.ContainsKey(Tuple.Create(p.X + j - offset.X, p.Y + i - offset.Y)))
                     {
-                        Chunk chu = chunkList[Tuple.Create(p.X + j - offset.X, p.Y + i - offset.Y)];
+                        Chunk chu = internalServer.chunkList[Tuple.Create(p.X + j - offset.X, p.Y + i - offset.Y)];
                         if (chu != null)
                         {
                             chunksdrawn++;
@@ -251,7 +254,7 @@ namespace Gridrift
                 offset += 32;
                 spriteBatch.DrawString(Globals.testFont, "Player Chunk: x:" + p.X + " y:" + p.Y, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
                 offset += 32;
-                spriteBatch.DrawString(Globals.testFont, "Client Chunks Loaded:" + chunkList.Count, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                spriteBatch.DrawString(Globals.testFont, "Client Chunks Loaded(same now):" + internalServer.chunkList.Count, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
                 offset += 32;
                 spriteBatch.DrawString(Globals.testFont, "FPS:" + frameRate, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
                 offset += 32;
@@ -260,7 +263,18 @@ namespace Gridrift
                 spriteBatch.DrawString(Globals.testFont, "IS Chunks Loaded:" + InternalServer.ISchunkCount, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
                 offset += 32;
                 spriteBatch.DrawString(Globals.testFont, "IS Regions Loaded:" + InternalServer.ISregionCount, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
-                
+
+                //char[] char1 = new char[96];
+                //for (int i = 32; i < 128; i++)
+                //{
+                //    char1[i-32] = (char)(i+1);
+                //}
+
+                string str = "!\"#$%&'()*+,-./0123456789:;<=>?@öABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+                string str2 = "The quick brown fox jumps over the lazy dog. Something really long written that I can use to check if this font would be okay to use for GridRift.";
+                offset += 32;
+                spriteBatch.DrawString(Globals.testFont, str2, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+
             }
             #endregion debug
 

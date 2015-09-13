@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 
-namespace Gridrift.Server.Packets
+namespace Gridrift.OldCode
 {
     public sealed class StateObject : IStateObject
     {

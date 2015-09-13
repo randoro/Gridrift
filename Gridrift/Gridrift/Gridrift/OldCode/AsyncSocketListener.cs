@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace Gridrift.Server.Packets
+namespace Gridrift.OldCode
 {
     public delegate void MessageReceivedHandler(int id, string msg);
     public delegate void MessageSubmittedHandler(int id, bool close);
