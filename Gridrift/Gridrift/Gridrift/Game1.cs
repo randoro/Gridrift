@@ -56,6 +56,7 @@ namespace Gridrift
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Globals.testPlayerTexture = Content.Load<Texture2D>("playerSheet");
             Globals.testBackgroundTexture = Content.Load<Texture2D>("dXdGz");
+            Globals.testGUITexture = Content.Load<Texture2D>("guitest");
             Globals.testFont = Content.Load<SpriteFont>("font");
 
             //chunkList = new Dictionary<Tuple<int, int>, Chunk>();
@@ -242,12 +243,15 @@ namespace Gridrift
             //spriteBatch.Draw(Globals.testPigTexture, new Rectangle(Player.getPosition().X, Player.getPosition().Y, 32, 32), Color.White);
             //spriteBatch.DrawString(Globals.testFont, "This is a test string", new Vector2(0, 0), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
             Player.draw(spriteBatch);
+            Vector2 cameraPos = Camera.cameraPosition();
+
+            spriteBatch.Draw(Globals.testGUITexture, new Vector2(cameraPos.X + (Globals.currentWindowWidth / 2) - (376 / 2), cameraPos.Y + Globals.currentWindowHeight - 53 - 10), new Rectangle(0, 0, 376, 53), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                
 
             #region debug
             if (debuggingActive)
             {
                 Point playerPos = Player.getPosition();
-                Vector2 cameraPos = Camera.cameraPosition();
                 int frameRate = FrameCounter.CalculateFrameRate();
                 int offset = 0;
                 spriteBatch.DrawString(Globals.testFont, "Player: x:" + playerPos.X + " y:" + playerPos.Y, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
