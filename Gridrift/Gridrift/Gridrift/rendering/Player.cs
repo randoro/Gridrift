@@ -21,6 +21,8 @@ namespace Gridrift.Rendering
         private static int drawOffsetX = 16;
         private static int drawOffsetY = 32;
 
+        public static float healthPercent { set; get; }
+        
 
         public static Point getPosition()
         {
@@ -181,7 +183,8 @@ namespace Gridrift.Rendering
 
             updatePosition();
 
-
+            //temporary
+            healthPercent -= 0.001f;
         }
 
         public static void draw(SpriteBatch spriteBatch)

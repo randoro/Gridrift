@@ -12,6 +12,7 @@ using Gridrift.Server;
 using Gridrift.Utility;
 using Gridrift.Rendering;
 using System.Threading;
+using Gridrift.GUIs;
 
 namespace Gridrift
 {
@@ -26,9 +27,10 @@ namespace Gridrift
         Point offset = new Point(2, 1); //set to 3,2 for more lag but no glapping. lowest: 2,1 high: 3,2
         long lastsyncUpdate;
         GameState gameState;
+        GUI toolbar;
 
         #region debug
-        bool debuggingActive = false;
+        public static bool debuggingActive = false;
         #endregion debug
 
 
@@ -56,13 +58,14 @@ namespace Gridrift
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Globals.testPlayerTexture = Content.Load<Texture2D>("playerSheet");
             Globals.testBackgroundTexture = Content.Load<Texture2D>("dXdGz");
-            Globals.testGUITexture = Content.Load<Texture2D>("guitest");
+            Globals.testGUITexture = Content.Load<Texture2D>("gui");
             Globals.testFont = Content.Load<SpriteFont>("font");
 
             //chunkList = new Dictionary<Tuple<int, int>, Chunk>();
 
             internalServer = new InternalServer(false);
-
+            Player.healthPercent = 1.0f;
+            toolbar = new ToolBar();
             
             lastsyncUpdate = DateTime.Now.Ticks;
 
@@ -101,42 +104,44 @@ namespace Gridrift
 
         protected override void Update(GameTime gameTime)
         {
+            KeyMouseReader.update(gameTime);
+
             syncUpdate();
 
-            
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+
+            if (KeyMouseReader.KeyPressed(Keys.Escape))
             {
                 //graphics.IsFullScreen = false;
                 //graphics.ApplyChanges();
                 this.Exit();
             }
 
-            if (Keyboard.GetState().IsKeyDown(Keys.F3))
+            if (KeyMouseReader.KeyPressed(Keys.F3))
             {
                 debuggingActive = !debuggingActive;
             }
-            
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Space))
+
+            if (KeyMouseReader.KeyPressed(Keys.Space))
             {
                 //ClientMessageSubmittedHandler simpleDelegate = new ClientMessageSubmittedHandler(sendFunction);
                 //simpleDelegate(null, false);
             }
 
             float multiplier = 1.0f; //almost not noticable
-            if (Keyboard.GetState().IsKeyDown(Keys.A))
+            if (KeyMouseReader.KeyHold(Keys.A))
             {
                 Player.changeVelocity(new Vector2(-0.7f * multiplier, 0));
             }
-            else if (Keyboard.GetState().IsKeyDown(Keys.D))
+            else if (KeyMouseReader.KeyHold(Keys.D))
             {
                 Player.changeVelocity(new Vector2(0.7f * multiplier, 0));
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.W))
+            if (KeyMouseReader.KeyHold(Keys.W))
             {
                 Player.changeVelocity(new Vector2(0, -0.7f * multiplier));
             }
-            else if (Keyboard.GetState().IsKeyDown(Keys.S))
+            else if (KeyMouseReader.KeyHold(Keys.S))
             {
                 Player.changeVelocity(new Vector2(0, 0.7f * multiplier));
             }
@@ -144,6 +149,7 @@ namespace Gridrift
             
             Player.update(gameTime);
             internalServer.syncUpdate();
+            toolbar.update(gameTime);
 
             Globals.currentWindowHeight = this.Window.ClientBounds.Height;
             Globals.currentWindowWidth = this.Window.ClientBounds.Width;
@@ -242,10 +248,12 @@ namespace Gridrift
 
             //spriteBatch.Draw(Globals.testPigTexture, new Rectangle(Player.getPosition().X, Player.getPosition().Y, 32, 32), Color.White);
             //spriteBatch.DrawString(Globals.testFont, "This is a test string", new Vector2(0, 0), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            
             Player.draw(spriteBatch);
             Vector2 cameraPos = Camera.cameraPosition();
 
-            spriteBatch.Draw(Globals.testGUITexture, new Vector2(cameraPos.X + (Globals.currentWindowWidth / 2) - (376 / 2), cameraPos.Y + Globals.currentWindowHeight - 53 - 10), new Rectangle(0, 0, 376, 53), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            toolbar.draw(spriteBatch);
+            spriteBatch.Draw(Globals.testGUITexture, new Vector2(cameraPos.X + (Globals.currentWindowWidth / 2) - (376 / 2), cameraPos.Y + Globals.currentWindowHeight - 53 - 10), new Rectangle(0, 0, 376, 53), Color.White, 0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1f);
                 
 
             #region debug

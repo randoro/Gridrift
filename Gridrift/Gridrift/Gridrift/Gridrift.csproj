@@ -85,10 +85,15 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GUI\Button.cs" />
-    <Compile Include="GUI\Menu.cs" />
-    <Compile Include="GUI\MenuObject.cs" />
-    <Compile Include="GUI\StringButton.cs" />
+    <Compile Include="GUIs\Button.cs" />
+    <Compile Include="GUIs\GUI.cs" />
+    <Compile Include="GUIs\GUIObject.cs" />
+    <Compile Include="GUIs\HealthBar.cs" />
+    <Compile Include="GUIs\IconButton.cs" />
+    <Compile Include="GUIs\StringButton.cs" />
+    <Compile Include="GUIs\ToolBar.cs" />
+    <Compile Include="GUIs\ValueBar.cs" />
+    <Compile Include="GUIs\KeyMouseReader.cs" />
     <Compile Include="Server\AntiCheat.cs" />
     <Compile Include="OldCode\AsyncClient.cs" />
     <Compile Include="OldCode\AsyncSocketListener.cs" />
