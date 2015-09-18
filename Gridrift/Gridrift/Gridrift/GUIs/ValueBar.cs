@@ -36,19 +36,19 @@ namespace Gridrift.GUIs
         {
             Vector2 cameraPos = Camera.cameraPosition();
             //left end
-            spriteBatch.Draw(Globals.testGUITexture, new Vector2(cameraPos.X + position.X, cameraPos.Y + position.Y), new Rectangle(1, 49, 2, 11), Color.White, 0f, Vector2.Zero, 1.0f, SpriteEffects.None, layerDepth);
-            for (int i = 0; i < barLength; i++)
+            spriteBatch.Draw(Globals.testGUITexture, new Vector2(cameraPos.X + position.X, cameraPos.Y + position.Y), new Rectangle(1, 49, 4, 17), Color.White, 0f, Vector2.Zero, 1.0f, SpriteEffects.None, layerDepth);
+            for (int i = 0; i < barLength / 2; i++)
             {
                 //middlebackground
-                spriteBatch.Draw(Globals.testGUITexture, new Vector2(cameraPos.X + position.X + 2 + i, cameraPos.Y + position.Y), new Rectangle(4, 49, 1, 11), Color.White, 0f, Vector2.Zero, 1.0f, SpriteEffects.None, layerDepth);         
+                spriteBatch.Draw(Globals.testGUITexture, new Vector2(cameraPos.X + position.X + 4 + i * 2, cameraPos.Y + position.Y), new Rectangle(6, 49, 2, 17), Color.White, 0f, Vector2.Zero, 1.0f, SpriteEffects.None, layerDepth);         
             }
             //right end
-            spriteBatch.Draw(Globals.testGUITexture, new Vector2(cameraPos.X + position.X + 2 + barLength, cameraPos.Y + position.Y), new Rectangle(6, 49, 2, 11), Color.White, 0f, Vector2.Zero, 1.0f, SpriteEffects.None, layerDepth);
+            spriteBatch.Draw(Globals.testGUITexture, new Vector2(cameraPos.X + position.X + 4 + barLength, cameraPos.Y + position.Y), new Rectangle(9, 49, 4, 17), Color.White, 0f, Vector2.Zero, 1.0f, SpriteEffects.None, layerDepth);
 
             for (int i = 0; i < valueToPaint; i++)
             {
                 //valuepainted
-                spriteBatch.Draw(Globals.testGUITexture, new Vector2(cameraPos.X + position.X + 2 + i, cameraPos.Y + position.Y + 2), new Rectangle(9, 49, 1, 7), Color.White, 0f, Vector2.Zero, 1.0f, SpriteEffects.None, layerDepth + 0.001f);
+                spriteBatch.Draw(Globals.testGUITexture, new Vector2(cameraPos.X + position.X + 4 + i, cameraPos.Y + position.Y + 4), new Rectangle(14, 49, 2, 9), Color.White, 0f, Vector2.Zero, 1.0f, SpriteEffects.None, layerDepth + 0.001f);
             }
 
         }
