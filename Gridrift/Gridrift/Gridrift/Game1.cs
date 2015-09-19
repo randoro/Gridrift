@@ -23,8 +23,8 @@ namespace Gridrift
         //Dictionary<Tuple<int, int>, Chunk> chunkList;
         InternalServer internalServer;
         Thread singlePlayerServerThread;
-        Point chunkLoadRange = new Point(5, 3); //set to 7,5 for more lag but no glapping. lowest: 5,3 high: 7,5
-        Point offset = new Point(2, 1); //set to 3,2 for more lag but no glapping. lowest: 2,1 high: 3,2
+        Point chunkLoadRange = new Point(7, 5); //set to 7,5 for more lag but no glapping. lowest: 5,3 high: 7,5
+        Point offset = new Point(3, 2); //set to 3,2 for more lag but no glapping. lowest: 2,1 high: 3,2
         long lastsyncUpdate;
         GameState gameState;
         GUI toolbar;
@@ -124,8 +124,10 @@ namespace Gridrift
 
             if (KeyMouseReader.KeyPressed(Keys.Space))
             {
-                //ClientMessageSubmittedHandler simpleDelegate = new ClientMessageSubmittedHandler(sendFunction);
-                //simpleDelegate(null, false);
+                graphics.PreferredBackBufferHeight = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height;
+                graphics.PreferredBackBufferWidth = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Width;
+                graphics.IsFullScreen = true;
+                graphics.ApplyChanges();
             }
 
             float multiplier = 1.0f; //almost not noticable
