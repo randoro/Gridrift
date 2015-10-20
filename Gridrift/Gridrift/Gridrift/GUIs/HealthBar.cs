@@ -34,6 +34,10 @@ namespace Gridrift.GUIs
                 spriteBatch.Draw(Globals.testGUITexture, new Vector2(cameraPos.X + position.X + 4 + i, cameraPos.Y + position.Y + 4), new Rectangle(14, 49, 2, 9), new Color(1.0f - ((float)valueToPaint / (float)barLength), ((float)valueToPaint / (float)barLength), 0f), 0f, Vector2.Zero, 1.0f, SpriteEffects.None, layerDepth + 0.001f);
             }
 
+            //temp
+            spriteBatch.Draw(Globals.testGUITexture, new Vector2(cameraPos.X + Globals.currentWindowWidth - 224, cameraPos.Y + Globals.currentWindowHeight - 48), new Rectangle(0, 176, 224, 48), Color.White, 0f, Vector2.Zero, 1.0f, SpriteEffects.None, layerDepth + 0.001f);
+            
+
             base.draw(spriteBatch);
         }
     }

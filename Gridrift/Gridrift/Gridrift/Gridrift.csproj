@@ -102,12 +102,14 @@
     <Compile Include="OldCode\IStateObject.cs" />
     <Compile Include="OldCode\Packet.cs" />
     <Compile Include="Rendering\Camera.cs" />
+    <Compile Include="Server\AsynchronousClient.cs" />
     <Compile Include="Server\Chunk.cs" />
     <Compile Include="Server\FileLoader.cs" />
     <Compile Include="Server\Generator.cs" />
     <Compile Include="OldCode\ClientConnection.cs" />
     <Compile Include="OldCode\ServerConnection.cs" />
     <Compile Include="OldCode\StateObject.cs" />
+    <Compile Include="Server\StateObject.cs" />
     <Compile Include="Utility\Enums.cs" />
     <Compile Include="Utility\Globals.cs" />
     <Compile Include="Server\InternalPlayer.cs" />

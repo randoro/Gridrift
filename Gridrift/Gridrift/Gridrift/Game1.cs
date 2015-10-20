@@ -13,6 +13,8 @@ using Gridrift.Utility;
 using Gridrift.Rendering;
 using System.Threading;
 using Gridrift.GUIs;
+using System.Net.Sockets;
+using System.Net;
 
 namespace Gridrift
 {
@@ -28,6 +30,10 @@ namespace Gridrift
         long lastsyncUpdate;
         GameState gameState;
         GUI toolbar;
+        String line = "";
+
+        Thread listeningThread;
+        TcpClient client;
 
         #region debug
         public static bool debuggingActive = false;
@@ -88,8 +94,8 @@ namespace Gridrift
         protected override void UnloadContent()
         {
 
-            
 
+            AsynchronousClient.StopClient();
             
             internalServer.closeServer();
             //clientConnection.stopListening();
@@ -99,6 +105,35 @@ namespace Gridrift
 
 
 
+        }
+
+        private void startListening()
+        {
+            client = new TcpClient();
+            client.Connect("127.0.0.1", 8888);
+            while (true)
+            {
+                Thread.Sleep(1000);
+                try
+                {
+                    while (!client.Connected)
+                    {
+                        //wait for connection
+                    }
+                    NetworkStream networkStream = client.GetStream();
+                    if (networkStream != null)
+                    {
+                        byte[] buffer = { 1, 2, 3, 4 };
+                        networkStream.Write(buffer, 0, 4);
+                        networkStream.Read(buffer, 0, 4);
+                        line = "{ " + buffer[0] + ", " + buffer[1] + ", " + buffer[2] + ", " + buffer[3] + " }";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(" >> " + ex.ToString());
+                }
+            }
         }
 
 
@@ -124,10 +159,12 @@ namespace Gridrift
 
             if (KeyMouseReader.KeyPressed(Keys.Space))
             {
-                graphics.PreferredBackBufferHeight = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height;
-                graphics.PreferredBackBufferWidth = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Width;
-                graphics.IsFullScreen = true;
-                graphics.ApplyChanges();
+                listeningThread = new Thread(new ThreadStart(AsynchronousClient.StartClient));
+                listeningThread.Start();
+                //graphics.PreferredBackBufferHeight = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height;
+                //graphics.PreferredBackBufferWidth = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Width;
+                //graphics.IsFullScreen = true;
+                //graphics.ApplyChanges();
             }
 
             float multiplier = 1.0f; //almost not noticable
@@ -277,6 +314,8 @@ namespace Gridrift
                 spriteBatch.DrawString(Globals.testFont, "IS Chunks Loaded:" + InternalServer.ISchunkCount, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
                 offset += 32;
                 spriteBatch.DrawString(Globals.testFont, "IS Regions Loaded:" + InternalServer.ISregionCount, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+                offset += 32;
+                spriteBatch.DrawString(Globals.testFont, line, new Vector2(cameraPos.X, cameraPos.Y + offset), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
 
                 //char[] char1 = new char[96];
                 //for (int i = 32; i < 128; i++)
